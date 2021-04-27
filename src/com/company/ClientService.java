@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClientService {
+    //variaveis
     private int c_id;
     private int o_id;
     private String name;
