@@ -11,7 +11,7 @@ public class ClientService {
     private String name;
     private Date Birthdate;
     private String mail;
-
+    //metodos
     public String getName() {return name;}
     public void setName(String name) {this.name = name;}
 
