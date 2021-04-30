@@ -142,34 +142,6 @@ public class EmployeeService {
         return list;
     }
 
-    public static List<EmployeeService> readAllPositions(){
-        Connection conn = SQLConnection.criarConexao();
-
-        String sqlCommand = "SELECT P_ID, POSITION, START_DATE, END_DATE FROM EMPLOYEE_POSITION";
-
-        List<EmployeeService> list = new ArrayList<>();
-
-        try {
-            PreparedStatement st = conn.prepareStatement(sqlCommand);
-
-
-            ResultSet rs = st.executeQuery();
-
-            while(rs.next()){
-                EmployeeService positions = new EmployeeService();
-
-                positions.setId_position(rs.getInt("P_ID"));
-                if (rs.getString("POSITION") != null) positions.setPosition(rs.getString("POSITION"));
-                list.add(positions);
-            }
-
-        } catch (SQLException ex) {
-            System.out.println("ERRO: " + ex.getMessage());
-        }
-
-        return list;
-    }
-
 
     public void delete(int id){
         // PreparedStatement

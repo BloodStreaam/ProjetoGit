@@ -18,7 +18,7 @@ public class ProductService {
     private int pr_quantity;
     private String name;
 
-
+    //Table Product
     public int getProduct_id() {return product_id;}
     public void setProduct_id(int product_id) {this.product_id = product_id;}
 
@@ -46,7 +46,7 @@ public class ProductService {
     public static List<ProductService> readAll(){
         Connection conn = SQLConnection.criarConexao();
 
-        String sqlCommand = "SELECT PRODUCT_ID, RD_ID, FARM_ID, TYPE_ID, OR_ID, PRICE_UN, PR_QUANTITY, PRODUCT_NAME FROM PRODUCTS";
+        String sqlCommand = "SELECT PRODUCT_ID, RD_ID, FARM_ID, TYPE_ID, OR_ID, PRICE_UNI, PR_QUANTITY, PRODUCT_NAME, REQ_ID FROM PRODUCTS";
 
         List<ProductService> list = new ArrayList<>();
 
@@ -64,9 +64,9 @@ public class ProductService {
                 product.setFarm_id(rs.getInt("FARM_ID"));
                 product.setType_id(rs.getInt("TYPE_ID"));
                 product.setOr_id(rs.getInt("OR_ID"));
-                product.setPrice_un(rs.getFloat("PRICE_UN"));
+                product.setPrice_un(rs.getFloat("PRICE_UNI"));
                 product.setPr_quantity(rs.getInt("PR_QUANTITY"));
-                if (rs.getString("NAME") != null) product.setName(rs.getString("NAME"));
+                if (rs.getString("PRODUCT_NAME") != null) product.setName(rs.getString("PRODUCT_NAME"));
                 list.add(product);
             }
 
@@ -75,5 +75,54 @@ public class ProductService {
         }
 
         return list;
+    }
+
+
+
+    public void read(int idProduct){
+        Connection conn = SQLConnection.criarConexao();
+
+        String sqlCommand = "SELECT PRODUCT_ID, RD_ID, FARM_ID, TYPE_ID, OR_ID, PRICE_UNI, PR_QUANTITY, PRODUCT_NAME, REQ_ID FROM PRODUCTS WHERE PRODUCT_ID = ?";
+
+        try {
+            PreparedStatement st = conn.prepareStatement(sqlCommand);
+            st.setInt(1, idProduct);
+
+
+            ResultSet rs = st.executeQuery();
+
+            if(rs.next()){
+                this.product_id=(rs.getInt("PRODUCT_ID"));
+                this.rd_id=(rs.getInt("RD_ID"));
+                this.farm_id=(rs.getInt("FARM_ID"));
+                this.type_id=(rs.getInt("TYPE_ID"));
+                this.or_id=(rs.getInt("OR_ID"));
+                this.price_un=(rs.getFloat("PRICE_UNI"));
+                this.pr_quantity=(rs.getInt("PR_QUANTITY"));
+                if (rs.getString("PRODUCT_NAME") != null) this.name= (rs.getString("PRODUCT_NAME"));
+
+            }
+            else{
+                System.out.println("ERRO: Não existe Cliente com o ID definido ");
+            }
+        } catch (SQLException ex) {
+            System.out.println("ERRO: " + ex.getMessage());
+        }
+
+    }
+
+    public void update(int farmid, int typeid, float price, int quantity, String name, int prodId) throws SQLException {
+        Connection conn = SQLConnection.criarConexao();
+
+        String sqlCommand = "UPDATE PRODUCTS SET FARM_ID = ?, TYPE_ID = ?, PRICE_UNI = ?, PR_QUANTITY = ?, PRODUCT_NAME = ? WHERE PRODUCT_ID = ?";
+        PreparedStatement pst = conn.prepareStatement(sqlCommand);
+
+        pst.setInt(1, farmid);
+        pst.setInt(2, typeid);
+        pst.setFloat(3, price);
+        pst.setInt(4, quantity);
+        pst.setString(5, name);
+        pst.setInt(6, prodId);
+        pst.execute();
     }
 }
