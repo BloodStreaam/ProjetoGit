@@ -13,7 +13,10 @@ public class ProductsManagement extends JDialog {
     private JButton editButton;
     private JButton deleteButton;
     private JButton backButton;
-    private JTable table1;
+
+    private JButton buttonOK;
+    private JButton buttonCancel;
+
     private JTextField nameInput;
     private JTextField quantityInput;
     private JTextField priceInput;
@@ -29,8 +32,13 @@ public class ProductsManagement extends JDialog {
     private JPanel editPanel;
     private JPanel infoPanel;
     private JButton xButton;
+    private JButton addButton1;
+    private JComboBox typeSearchBox;
+    private JTextField searchInput;
+    private JButton searchButton;
+    private JTable table1;
     private JTextField textField4;
-    private JTable jtable;
+    private static JTable jtable;
     private static List<ProductService> products;
     private static List<TypeService> types;
     private static List<FarmService> farms;
@@ -44,14 +52,88 @@ public class ProductsManagement extends JDialog {
         setContentPane(contentPane);
         setModal(true);
 
+        getRootPane().setDefaultButton(buttonOK);
+
+
         jscrollpane1.getViewport().add(jtable=createJTable());
+        fillSearchCombobox();
         editPanel.setVisible(false);
         infoPanel.setVisible(false);
+
 
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AdminManagement.jProductsManagement.setVisible(false);
+                setVisible(false);
+            }
+        });
+
+        save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    updateProduct();
+
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        });
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clearInputs();
+                fillAddAreaComboboxes();
+                addButton1.setVisible(true);
+                save.setVisible(false);
+                editPanel.setVisible(true);
+                pack();
+            }
+        });
+        editButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clearInputs();
+                showInfoEdit(idProductConverted);
+                save.setVisible(true);
+                addButton1.setVisible(false);
+                editPanel.setVisible(true);
+                pack();
+            }
+        });
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                deleteProduct();
+            }
+        });
+        addButton1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    addProduct();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        });
+        xButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clearInputs();
+                editPanel.setVisible(false);
+                pack();
+            }
+        });
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    searchProducts();
+                    jtable.repaint();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }
         });
 
@@ -69,33 +151,52 @@ public class ProductsManagement extends JDialog {
             }
 
         });
-        editButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showInfoEdit(idProductConverted);
-                editPanel.setVisible(true);
-                pack();
-            }
-        });
-        save.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    updateProduct();
-
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                }
-            }
-        });
-        xButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                editPanel.setVisible(false);
-                pack();
-            }
-        });
     }
+
+
+    private void deleteProduct(){
+        int dialogButton = JOptionPane.YES_NO_OPTION;
+        ProductService deleteProd = new ProductService();
+
+        int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like to Delete this Product?","Warning",dialogButton);
+        if(dialogResult == JOptionPane.YES_OPTION){
+            deleteProd.delete(idProductConverted);
+        }
+    }
+
+
+
+
+    private void addProduct() throws SQLException {
+        int type_id = 0;
+        int farm_id = 0;
+
+        ProductService addProd = new ProductService(); //Para correr a função create() que se encontra o file ProductService
+        types = TypeService.readAllTypes(); //Lista de Todos os tipos
+        farms = FarmService.readAllFarms();
+
+        for (TypeService type : types) {
+            if(type.getType().equals(TypeInput.getSelectedItem())){
+                type_id = type.getId_type();
+                break;
+            }
+        }
+        for (FarmService farm : farms) {
+            if(farm.getName().equals(farmInput.getSelectedItem())){
+                farm_id = farm.getIdFarm();
+                break;
+            }
+        }
+
+        addProd.create(farm_id, type_id, Float.parseFloat(priceInput.getText()), Integer.parseInt(quantityInput.getText()), String.valueOf(nameInput.getText()));
+        clearInputs();
+        editPanel.setVisible(false);
+        pack();
+
+    }
+
+
+
 
     private void updateProduct() throws SQLException {
         int type_id = 0; //Guarda o id do tipo de produto
@@ -130,9 +231,12 @@ public class ProductsManagement extends JDialog {
 
     }
 
+
+
+
     private void clearInputs(){
         List<JTextField> tfList = new   ArrayList<JTextField>();
-        List<JComboBox> cbList = new   ArrayList<JComboBox>();
+        List<JComboBox> cbList = new ArrayList<JComboBox>();
 // somewhere in your code will have
         JPanel panel = new JPanel();
         tfList.add(nameInput);
@@ -151,6 +255,50 @@ public class ProductsManagement extends JDialog {
         }
 
         // add to list
+    }
+
+
+
+
+    private void fillAddAreaComboboxes(){
+        types = TypeService.readAllTypes(); //lê todos os tipos que estão na tabela Type
+        farms = FarmService.readAllFarms(); //lê todas as quintas que estão na tabela Farms
+
+        for (TypeService type : types) {
+            TypeInput.addItem(type.getType());
+        }
+
+        for(FarmService farm: farms){
+            farmInput.addItem(farm.getName());
+        }
+    }
+
+
+    private void fillSearchCombobox(){
+        types = TypeService.readAllTypes(); //lê todos os tipos que estão na tabela Type
+
+        typeSearchBox.addItem("No Filter");
+        for (TypeService type : types) {
+            typeSearchBox.addItem(type.getType());
+        }
+
+    }
+
+    private void searchProducts() throws SQLException {
+        int type_id = 0;
+
+        ProductService prodSearch = new ProductService();
+        types = TypeService.readAllTypes(); //lê todos os tipos que estão na tabela Type
+
+        for (TypeService type : types) {
+            if(type.getType().equals(typeSearchBox.getSelectedItem())){
+                type_id = type.getId_type();
+            }
+        }
+
+        products = ProductService.search(type_id,searchInput.getText());
+
+
     }
 
     // Apreesenta toda a ifnroamção do produto selecionado para edição
@@ -184,6 +332,8 @@ public class ProductsManagement extends JDialog {
         }
     }
 
+
+
     //Apresenta a informação completa do produto
     private void showFullDetail(int idProduct){
         ProductService product = new ProductService();
@@ -203,6 +353,8 @@ public class ProductsManagement extends JDialog {
         farmField.setText("Farm: " + farm.getName());
         typefield.setText("Type: " + String.valueOf(type.getType()));
     }
+
+
 
     //Cria a tabela de produtos com as informações mais importantes
     private static JTable createJTable() {
@@ -232,6 +384,8 @@ public class ProductsManagement extends JDialog {
         return jtable;
     }
 
+
+
     public static void main(String[] args) {
         ProductsManagement dialog = new ProductsManagement();
         dialog.pack();
@@ -240,5 +394,4 @@ public class ProductsManagement extends JDialog {
 
         AdminManagement.jAdminManagement.setVisible(false);
     }
-
 }

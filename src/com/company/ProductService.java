@@ -46,7 +46,7 @@ public class ProductService {
     public static List<ProductService> readAll(){
         Connection conn = SQLConnection.criarConexao();
 
-        String sqlCommand = "SELECT PRODUCT_ID, RD_ID, FARM_ID, TYPE_ID, OR_ID, PRICE_UNI, PR_QUANTITY, PRODUCT_NAME, REQ_ID FROM PRODUCTS";
+        String sqlCommand = "SELECT PRODUCT_ID, RD_ID, FARM_ID, TYPE_ID, OR_ID, PRICE_UNI, PR_QUANTITY, PRODUCT_NAME FROM PRODUCTS";
 
         List<ProductService> list = new ArrayList<>();
 
@@ -82,7 +82,7 @@ public class ProductService {
     public void read(int idProduct){
         Connection conn = SQLConnection.criarConexao();
 
-        String sqlCommand = "SELECT PRODUCT_ID, RD_ID, FARM_ID, TYPE_ID, OR_ID, PRICE_UNI, PR_QUANTITY, PRODUCT_NAME, REQ_ID FROM PRODUCTS WHERE PRODUCT_ID = ?";
+        String sqlCommand = "SELECT PRODUCT_ID, RD_ID, FARM_ID, TYPE_ID, OR_ID, PRICE_UNI, PR_QUANTITY, PRODUCT_NAME FROM PRODUCTS WHERE PRODUCT_ID = ?";
 
         try {
             PreparedStatement st = conn.prepareStatement(sqlCommand);
@@ -111,6 +111,78 @@ public class ProductService {
 
     }
 
+    public void delete(int id){
+        // PreparedStatement
+        Connection conn = SQLConnection.criarConexao();
+
+        String sqlCommand = "DELETE PRODUCTS WHERE PRODUCT_ID = ?";
+
+        try {
+            PreparedStatement st = conn.prepareStatement(sqlCommand);
+            st.setInt(1, id);
+
+            st.execute();
+
+        } catch (SQLException ex) {
+            System.out.println("ERRO: " + ex.getMessage());
+        }
+    }
+
+    public static List<ProductService> search(int typeid, String product) throws SQLException {
+        Connection conn = SQLConnection.criarConexao();
+
+        String sqlCommand = "SELECT PRODUCT_ID, RD_ID, FARM_ID, TYPE_ID, OR_ID, PRICE_UNI, PR_QUANTITY, PRODUCT_NAME FROM PRODUCTS ";
+        if(typeid != 0 && product.equals("")){
+            sqlCommand+= "WHERE TYPE_ID = ? ";
+        }
+        if(product.equals("") && typeid == 0){
+            sqlCommand+= "WHERE PRODUCT_ID = ? ";
+        }
+        if(typeid != 0 && product.equals("")){
+            sqlCommand+="WHERE TYPE_ID = ? AND PRODUCT_NAME = ?";
+        }
+
+        sqlCommand+="ORDER BY PRODUCT_ID";
+
+        List<ProductService> list = new ArrayList<>();
+
+        try {
+            PreparedStatement st = conn.prepareStatement(sqlCommand);
+            if(typeid != 0 && product.equals("")){
+                st.setInt(1, typeid);
+            }
+            if(product.equals("") && typeid == 0){
+                st.setString(1, product);
+            }
+            if(typeid != 0 && product.equals("")){
+                st.setInt(1, typeid);
+                st.setString(2, product);
+            }
+
+
+            ResultSet rs = st.executeQuery();
+
+            while(rs.next()){
+                ProductService prod = new ProductService();
+
+                prod.setProduct_id(rs.getInt("PRODUCT_ID"));
+                prod.setRd_id(rs.getInt("RD_ID"));
+                prod.setFarm_id(rs.getInt("FARM_ID"));
+                prod.setType_id(rs.getInt("TYPE_ID"));
+                prod.setOr_id(rs.getInt("OR_ID"));
+                prod.setPrice_un(rs.getFloat("PRICE_UNI"));
+                prod.setPr_quantity(rs.getInt("PR_QUANTITY"));
+                if (rs.getString("PRODUCT_NAME") != null) prod.setName(rs.getString("PRODUCT_NAME"));
+                list.add(prod);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERRO: " + ex.getMessage());
+        }
+
+        return list;
+    }
+
     public void update(int farmid, int typeid, float price, int quantity, String name, int prodId) throws SQLException {
         Connection conn = SQLConnection.criarConexao();
 
@@ -125,4 +197,20 @@ public class ProductService {
         pst.setInt(6, prodId);
         pst.execute();
     }
+
+    public void create(int farmID, int type_ID, float price, int quantity, String name) throws SQLException {
+        Connection conn = SQLConnection.criarConexao();
+
+        String sqlCommand = "INSERT INTO PRODUCTS COLUMNS (FARM_ID, TYPE_ID, PRICE_UNI, PR_QUANTITY, PRODUCT_NAME) "
+                + "VALUES (?, ?, ?, ?, ?)";
+        PreparedStatement pst = conn.prepareStatement(sqlCommand);
+
+        pst.setInt(1, farmID);
+        pst.setInt(2, type_ID);
+        pst.setFloat(3, price);
+        pst.setInt(4, quantity);
+        pst.setString(5, name);
+        pst.execute();
+    }
+
 }
