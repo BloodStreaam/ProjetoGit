@@ -18,7 +18,7 @@ public class ProductService {
     private int pr_quantity;
     private String name;
 
-
+    //Table Product
     public int getProduct_id() {return product_id;}
     public void setProduct_id(int product_id) {this.product_id = product_id;}
 
@@ -46,11 +46,7 @@ public class ProductService {
     public static List<ProductService> readAll(){
         Connection conn = SQLConnection.criarConexao();
 
-<<<<<<< Updated upstream
-        String sqlCommand = "SELECT PRODUCT_ID, RD_ID, FARM_ID, TYPE_ID, OR_ID, PRICE_UN, PR_QUANTITY, PRODUCT_NAME FROM PRODUCTS";
-=======
         String sqlCommand = "SELECT PRODUCT_ID, RD_ID, FARM_ID, TYPE_ID, OR_ID, PRICE_UNI, PR_QUANTITY, PRODUCT_NAME FROM PRODUCTS";
->>>>>>> Stashed changes
 
         List<ProductService> list = new ArrayList<>();
 
@@ -68,9 +64,9 @@ public class ProductService {
                 product.setFarm_id(rs.getInt("FARM_ID"));
                 product.setType_id(rs.getInt("TYPE_ID"));
                 product.setOr_id(rs.getInt("OR_ID"));
-                product.setPrice_un(rs.getFloat("PRICE_UN"));
+                product.setPrice_un(rs.getFloat("PRICE_UNI"));
                 product.setPr_quantity(rs.getInt("PR_QUANTITY"));
-                if (rs.getString("NAME") != null) product.setName(rs.getString("NAME"));
+                if (rs.getString("PRODUCT_NAME") != null) product.setName(rs.getString("PRODUCT_NAME"));
                 list.add(product);
             }
 
@@ -80,8 +76,6 @@ public class ProductService {
 
         return list;
     }
-<<<<<<< Updated upstream
-=======
 
 
 
@@ -219,5 +213,4 @@ public class ProductService {
         pst.execute();
     }
 
->>>>>>> Stashed changes
 }

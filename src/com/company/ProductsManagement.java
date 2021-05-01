@@ -1,7 +1,11 @@
 package com.company;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProductsManagement extends JDialog {
     private JPanel contentPane;
@@ -9,11 +13,10 @@ public class ProductsManagement extends JDialog {
     private JButton editButton;
     private JButton deleteButton;
     private JButton backButton;
-    private JTable table1;
-<<<<<<< Updated upstream
+
     private JButton buttonOK;
     private JButton buttonCancel;
-=======
+
     private JTextField nameInput;
     private JTextField quantityInput;
     private JTextField priceInput;
@@ -33,8 +36,9 @@ public class ProductsManagement extends JDialog {
     private JComboBox typeSearchBox;
     private JTextField searchInput;
     private JButton searchButton;
+    private JTable table1;
     private JTextField textField4;
-    private JTable jtable;
+    private static JTable jtable;
     private static List<ProductService> products;
     private static List<TypeService> types;
     private static List<FarmService> farms;
@@ -43,20 +47,19 @@ public class ProductsManagement extends JDialog {
     private static int idProductOnEdit;
 
 
->>>>>>> Stashed changes
 
     public ProductsManagement() {
         setContentPane(contentPane);
         setModal(true);
-<<<<<<< Updated upstream
+
         getRootPane().setDefaultButton(buttonOK);
-=======
+
 
         jscrollpane1.getViewport().add(jtable=createJTable());
         fillSearchCombobox();
         editPanel.setVisible(false);
         infoPanel.setVisible(false);
->>>>>>> Stashed changes
+
 
         backButton.addActionListener(new ActionListener() {
             @Override
@@ -64,10 +67,75 @@ public class ProductsManagement extends JDialog {
                 setVisible(false);
             }
         });
-<<<<<<< Updated upstream
-    }
 
-=======
+        save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    updateProduct();
+
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        });
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clearInputs();
+                fillAddAreaComboboxes();
+                addButton1.setVisible(true);
+                save.setVisible(false);
+                editPanel.setVisible(true);
+                pack();
+            }
+        });
+        editButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clearInputs();
+                showInfoEdit(idProductConverted);
+                save.setVisible(true);
+                addButton1.setVisible(false);
+                editPanel.setVisible(true);
+                pack();
+            }
+        });
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                deleteProduct();
+            }
+        });
+        addButton1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    addProduct();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        });
+        xButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clearInputs();
+                editPanel.setVisible(false);
+                pack();
+            }
+        });
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    searchProducts();
+                    jtable.repaint();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        });
 
         jtable.addMouseListener(new MouseAdapter() {
             @Override
@@ -83,79 +151,8 @@ public class ProductsManagement extends JDialog {
             }
 
         });
-        editButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clearInputs();
-                showInfoEdit(idProductConverted);
-                save.setVisible(true);
-                addButton1.setVisible(false);
-                editPanel.setVisible(true);
-                pack();
-            }
-        });
-
-
-        save.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    updateProduct();
-
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                }
-            }
-        });
-
-
-        xButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clearInputs();
-                editPanel.setVisible(false);
-                pack();
-            }
-        });
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clearInputs();
-                fillAddAreaComboboxes();
-                addButton1.setVisible(true);
-                save.setVisible(false);
-                editPanel.setVisible(true);
-                pack();
-            }
-        });
-        addButton1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    addProduct();
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                }
-            }
-        });
-        deleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                deleteProduct();
-            }
-        });
-        searchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    searchProducts();
-                    jtable.repaint();
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                }
-            }
-        });
     }
+
 
     private void deleteProduct(){
         int dialogButton = JOptionPane.YES_NO_OPTION;
@@ -239,7 +236,7 @@ public class ProductsManagement extends JDialog {
 
     private void clearInputs(){
         List<JTextField> tfList = new   ArrayList<JTextField>();
-        List<JComboBox> cbList = new   ArrayList<JComboBox>();
+        List<JComboBox> cbList = new ArrayList<JComboBox>();
 // somewhere in your code will have
         JPanel panel = new JPanel();
         tfList.add(nameInput);
@@ -386,7 +383,7 @@ public class ProductsManagement extends JDialog {
 
         return jtable;
     }
->>>>>>> Stashed changes
+
 
 
     public static void main(String[] args) {
