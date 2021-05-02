@@ -34,6 +34,7 @@ public class EmployeesManagement extends JDialog {
     private JLabel zipInfo;
     private JLabel birthdateInfo;
     private JLabel positionInfo;
+    private JTextField textField1;
     public static EmployeesManagement JEmployees;
     public static boolean jAddCheck = false;
     public static boolean jEditCheck = false;

@@ -21,8 +21,7 @@ public class SQLConnection {
             }
 
             try {
-                conn = DriverManager.getConnection(
-                        "jdbc:oracle:thin:@localhost:1521:ORCL", "PROJECT1", "123456");
+                conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "PROJECT1", "root");
                 //conn.setAutoCommit(false);
             } catch (Exception e) {
                 System.out.println("ERRO " + e.getMessage());

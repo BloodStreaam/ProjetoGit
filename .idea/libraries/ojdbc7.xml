@@ -2,6 +2,7 @@
   <library name="ojdbc7">
     <CLASSES>
       <root url="jar://$USER_HOME$/Documents/ojdbc7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/.idea/libraries/ojdbc7.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
