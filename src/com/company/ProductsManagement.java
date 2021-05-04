@@ -13,10 +13,6 @@ public class ProductsManagement extends JDialog {
     private JButton editButton;
     private JButton deleteButton;
     private JButton backButton;
-
-    private JButton buttonOK;
-    private JButton buttonCancel;
-
     private JTextField nameInput;
     private JTextField quantityInput;
     private JTextField priceInput;
@@ -52,7 +48,6 @@ public class ProductsManagement extends JDialog {
         setContentPane(contentPane);
         setModal(true);
 
-        getRootPane().setDefaultButton(buttonOK);
 
 
         jscrollpane1.getViewport().add(jtable=createJTable());
@@ -331,7 +326,6 @@ public class ProductsManagement extends JDialog {
             }
         }
     }
-
 
 
     //Apresenta a informação completa do produto
