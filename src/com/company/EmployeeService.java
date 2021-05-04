@@ -1,13 +1,11 @@
 package com.company;
 
-import javax.swing.*;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class EmployeeService {
+
     private int e_id;
     private String address;
     private String zip;
@@ -17,17 +15,7 @@ public class EmployeeService {
     private int phone;
     private float salary;
     private int position_id;
-    private int id_position;
-    private String position;
 
-
-    //----ID da table Employee_Position----///
-    public int getId_position() {return id_position;}
-    public void setId_position(int id_position) {this.id_position = id_position;}
-
-    //----Position da table Employee_position-----//
-    public String getPosition() {return position;}
-    public void setPosition(String position) {this.position = position;}
 
     public int getE_id() {return e_id;}
     public void setIdEmployee(int e_id) {
@@ -75,40 +63,10 @@ public class EmployeeService {
     }
 
 
-/* public void read(int e_id){
-        Connection conn = SQLConnection.criarConexao();
-
-        String sqlCommand = "SELECT (E_ID, A_ID, NAME, BIRTHDATE, MAIL, PHONE, SALARY, POSITION, P_ID) FROM EMPLOYEE";
-
-        try {
-            PreparedStatement st = conn.prepareStatement(sqlCommand);
-            st.setInt(1, e_id);
-
-
-            ResultSet rs = st.executeQuery();
-
-            if(rs.next()){
-                this.e_id = idCliente;
-                if (rs.getString("NOME") != null) this.nome = rs.getString("NOME");
-                else this.nome = "";
-                //
-                if (rs.getString("MORADA") != null) this.morada = rs.getString("MORADA");
-                else this.morada = "";
-                if (rs.getString("CPOSTAL") != null) this.cpostal = rs.getString("CPOSTAL");
-                else this.cpostal = "";
-            }
-            else{
-                System.out.println("ERRO: Não existe Cliente com o ID definido ");
-            }
-        } catch (SQLException ex) {
-            System.out.println("ERRO: " + ex.getMessage());
-        }
-    }*/
-
     public static List<EmployeeService> readAll(){
         Connection conn = SQLConnection.criarConexao();
 
-        String sqlCommand = "SELECT E_ID, NAME, BIRTHDATE, MAIL, PHONE, SALARY, P_ID, ADDRESS, ZIP FROM EMPLOYEE";
+        String sqlCommand = "SELECT E_ID, NAME, BIRTHDATE, MAIL, PHONE, SALARY, P_ID, ADDRESS, ZIP FROM EMPLOYEE ORDER BY E_ID";
 
         List<EmployeeService> list = new ArrayList<>();
 
@@ -119,7 +77,7 @@ public class EmployeeService {
             ResultSet rs = st.executeQuery();
 
             while(rs.next()){
-               EmployeeService employee = new EmployeeService();
+                EmployeeService employee = new EmployeeService();
 
                 employee.setIdEmployee(rs.getInt("E_ID"));
                 if (rs.getString("NAME") != null) employee.setName(rs.getString("NAME"));
@@ -144,10 +102,10 @@ public class EmployeeService {
 
 
     public void delete(int id){
-        // PreparedStatement
+
         Connection conn = SQLConnection.criarConexao();
 
-        String sqlCommand = "DELETE employee WHERE ID = 'id'";
+        String sqlCommand = "DELETE EMPLOYEE WHERE E_ID = ?";
 
         try {
             PreparedStatement st = conn.prepareStatement(sqlCommand);
@@ -180,14 +138,14 @@ public class EmployeeService {
                 //
                 this.phone=(rs.getInt("PHONE"));
                 //
-               this.salary=(rs.getFloat("SALARY"));
+                this.salary=(rs.getFloat("SALARY"));
                 this.position_id=(rs.getInt("P_ID"));
                 if (rs.getString("ADDRESS") != null) this.address=(rs.getString("ADDRESS"));
                 if (rs.getString("ZIP") != null) this.zip= (rs.getString("ZIP"));
 
             }
             else{
-                System.out.println("ERRO: Não existe Cliente com o ID definido ");
+                System.out.println("ERRO: Não existe Employee com o ID definido ");
             }
         } catch (SQLException ex) {
             System.out.println("ERRO: " + ex.getMessage());
@@ -195,6 +153,41 @@ public class EmployeeService {
 
     }
 
+    public void create(String name, Date birthdate, String mail, int phone, float salary, int p_id, String address, String zip) throws SQLException {
+        Connection conn = SQLConnection.criarConexao();
+
+        String sqlCommand = "INSERT INTO EMPLOYEE COLUMNS (NAME, BIRTHDATE, MAIL, PHONE, SALARY, P_ID, ADDRESS, ZIP) "
+                + "VALUES (?, ?, ?, ?, ?, ? ,?, ?)";
+        PreparedStatement pst = conn.prepareStatement(sqlCommand);
+
+        pst.setString(1, name);
+        pst.setDate(2, birthdate);
+        pst.setString(3, mail);
+        pst.setInt(4, phone);
+        pst.setFloat(5, salary);
+        pst.setInt(6, p_id);
+        pst.setString(7, address);
+        pst.setString(8, zip);
+        pst.execute();
+    }
+
+    public void update(String name, Date birthdate, String mail, int phone, float salary, int p_id, String address, String zip, int e_id) throws SQLException {
+        Connection conn = SQLConnection.criarConexao();
+
+        String sqlCommand = "UPDATE EMPLOYEE SET NAME = ?, BIRTHDATE = ?, MAIL = ?, PHONE = ?, SALARY = ?, P_ID = ?, ADDRESS = ?, ZIP = ? WHERE E_ID = ?";
+        PreparedStatement pst = conn.prepareStatement(sqlCommand);
+
+        pst.setString(1, name);
+        pst.setDate(2, birthdate);
+        pst.setString(3, mail);
+        pst.setInt(4, phone);
+        pst.setFloat(5, salary);
+        pst.setInt(6, p_id);
+        pst.setString(7, address);
+        pst.setString(8, zip);
+        pst.setInt(9, e_id);
+        pst.execute();
+    }
 
 
 }
