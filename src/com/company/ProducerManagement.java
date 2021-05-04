@@ -5,7 +5,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
 import java.util.List;
 
-public class ClientsManagement extends JDialog {
+public class ProducerManagement extends JDialog {
     private JPanel contentPane;
     private JButton ADD;
     private JButton editButton;
@@ -13,34 +13,31 @@ public class ClientsManagement extends JDialog {
     public static boolean jEditCheck = false;
     private JButton deleteButton;
     private JButton backButton;
-    private JComboBox comboBox1;
+    private JButton seachButton;
     private JTextField textField1;
-    private JButton sButton;
-    private JTextField in_name;
-    private JTextField in_mail;
-    private JTextField in_phone;
-    private JTextField in_address;
-    private JTextField in_zip;
-    private JComboBox day_box;
-    private JComboBox mounth_box;
-    private JComboBox year_box;
-    private JButton SAVEButton;
+    private JComboBox comboBox1;
+    private JButton viewRequestButton;
+    private JTextField name_in;
+    private JTextField phone_in;
+    private JTextField email_in;
+    private JComboBox comboBox2;
+    private JButton saveButton;
     private JButton ADDButton;
     private JTextField text2;
-    private JTable jtable;
-    private JScrollPane scroll2;
+    private JScrollPane scroll1;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private static List<ClientService> clients;
-    public static String idClient;
-    public static ClientsManagement JClient;
+    private JScrollPane scrollPane1;
+    private JTable jtable;
+    private static List<ProducerService> producers;
+    public static ProducerManagement JProducer;
+    public static String idProducer;
 
-
-    public ClientsManagement() {
+    public ProducerManagement() {
         setContentPane(contentPane);
         setModal(true);
 
-        scroll2.getViewport().add(jtable=createJTable());
+        scroll1.getViewport().add(jtable=createJTable());
 
 
 
@@ -57,7 +54,7 @@ public class ClientsManagement extends JDialog {
         editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                idClient = jtable.getValueAt(jtable.getSelectedRow(),0).toString();
+                idProducer = jtable.getValueAt(jtable.getSelectedRow(),0).toString();
                 jEditCheck = true;
 
 
@@ -68,8 +65,8 @@ public class ClientsManagement extends JDialog {
         jtable.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                idClient = jtable.getValueAt(jtable.getSelectedRow(),0).toString();
-                System.out.print(idClient);
+                idProducer = jtable.getValueAt(jtable.getSelectedRow(),0).toString();
+                System.out.print(idProducer);
 
             }
 
@@ -81,15 +78,15 @@ public class ClientsManagement extends JDialog {
     }
 
     private static JTable createJTable(){
-        clients = ClientService.readAll();
+        producers = ProducerService.readAll();
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("ID");
         model.addColumn("Name");
-        model.addColumn("Bithdate");
         model.addColumn("Mail");
+        model.addColumn("Phone");
 
-        for(ClientService cli : clients) {
-            model.addRow(new Object[] { cli.getC_id(), cli.getName(), cli.getBirthdate() , cli.getMail()});
+        for(ProducerService pro : producers) {
+            model.addRow(new Object[] { pro.getPROD_ID(), pro.getName(), pro.getMail() , pro.getPhone()});
         }
 
         JTable jtable = new JTable(model);
@@ -99,11 +96,18 @@ public class ClientsManagement extends JDialog {
         return jtable;
     }
 
-    public static void main(String[] args) {
 
-        JClient =  new ClientsManagement();
-        JClient.pack();
-        JClient.setVisible(true);
+
+
+    public static void main(String[] args) {
+        //System.out.print(createJTable());
+        JProducer =  new ProducerManagement();
+        JProducer.pack();
+        JProducer.setVisible(true);
         System.exit(0);
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
     }
 }
