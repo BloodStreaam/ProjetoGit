@@ -44,24 +44,16 @@ public class EmployeesManagement extends JDialog {
     public static String idEmployee;
 
 
-
     public EmployeesManagement() {
         setContentPane(contentPane);
         setModal(true);
 
         scrollPane1.getViewport().add(jtable=createJTable());
 
-        for(EmployeeService emp : employees)
-            System.out.println("ID " + emp.getName() + " chama-se " + emp.getMail() + " e mora em " + emp.getAddress());
-
-
-
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 jAddCheck = true;
-
-
             }
         });
         editButton.addActionListener(new ActionListener() {
@@ -69,24 +61,17 @@ public class EmployeesManagement extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 idEmployee = jtable.getValueAt(jtable.getSelectedRow(),0).toString();
                 jEditCheck = true;
-
-
-
             }
         });
-
         jtable.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 idEmployee = jtable.getValueAt(jtable.getSelectedRow(),0).toString();
                 System.out.print(idEmployee);
-
             }
 
         });
-
     }
-
     private void showEditInfoEmployee(){
 
     }

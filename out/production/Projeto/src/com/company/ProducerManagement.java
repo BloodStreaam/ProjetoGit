@@ -1,60 +1,113 @@
 package com.company;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
+import java.util.List;
 
 public class ProducerManagement extends JDialog {
     private JPanel contentPane;
+    private JButton ADD;
+    private JButton editButton;
+    public static boolean jAddCheck = false;
+    public static boolean jEditCheck = false;
+    private JButton deleteButton;
+    private JButton backButton;
+    private JButton seachButton;
+    private JTextField textField1;
+    private JComboBox comboBox1;
+    private JButton viewRequestButton;
+    private JTextField name_in;
+    private JTextField phone_in;
+    private JTextField email_in;
+    private JComboBox comboBox2;
+    private JButton saveButton;
+    private JButton ADDButton;
+    private JTextField text2;
+    private JScrollPane scroll1;
     private JButton buttonOK;
     private JButton buttonCancel;
+    private JScrollPane scrollPane1;
+    private JTable jtable;
+    private static List<ProducerService> producers;
+    public static ProducerManagement JProducer;
+    public static String idProducer;
 
     public ProducerManagement() {
         setContentPane(contentPane);
         setModal(true);
-        getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(new ActionListener() {
+        scroll1.getViewport().add(jtable=createJTable());
+
+
+
+
+
+        ADD.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                onOK();
+                jAddCheck = true;
+
+
+            }
+        });
+        editButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                idProducer = jtable.getValueAt(jtable.getSelectedRow(),0).toString();
+                jEditCheck = true;
+
+
+
             }
         });
 
-        buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
+        jtable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                idProducer = jtable.getValueAt(jtable.getSelectedRow(),0).toString();
+                System.out.print(idProducer);
+
             }
+
         });
 
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onCancel();
-            }
-        });
 
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+
     }
 
-    private void onOK() {
-        // add your code here
-        dispose();
+    private static JTable createJTable(){
+        producers = ProducerService.readAll();
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Name");
+        model.addColumn("Mail");
+        model.addColumn("Phone");
+
+        for(ProducerService pro : producers) {
+            model.addRow(new Object[] { pro.getPROD_ID(), pro.getName(), pro.getMail() , pro.getPhone()});
+        }
+
+        JTable jtable = new JTable(model);
+        jtable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+
+        return jtable;
     }
 
-    private void onCancel() {
-        // add your code here if necessary
-        dispose();
-    }
+
+
 
     public static void main(String[] args) {
-        ProducerManagement dialog = new ProducerManagement();
-        dialog.pack();
-        dialog.setVisible(true);
+        //System.out.print(createJTable());
+        JProducer =  new ProducerManagement();
+        JProducer.pack();
+        JProducer.setVisible(true);
         System.exit(0);
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
     }
 }

@@ -151,8 +151,6 @@ public class EmployeeService {
 
         try {
             PreparedStatement st = conn.prepareStatement(sqlCommand);
-
-
             ResultSet rs = st.executeQuery();
 
             while(rs.next()){
