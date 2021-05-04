@@ -10,7 +10,25 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/Documents/ojdbc7.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/javax.persistence_2.1.0.v201304241213.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/src/lib/eclipselink.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/src/lib/ojdbc7.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

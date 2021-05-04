@@ -55,6 +55,30 @@ public class PositionService{
     }
 
 
+    public void readPosition(int idPosition){
+        Connection conn = SQLConnection.criarConexao();
 
+        String sqlCommand = "SELECT P_ID, POSITION, START_DATE, END_DATE FROM EMPLOYEE_POSITION WHERE P_ID = ?";
+
+        try {
+            PreparedStatement st = conn.prepareStatement(sqlCommand);
+            st.setInt(1, idPosition);
+
+
+            ResultSet rs = st.executeQuery();
+
+            if(rs.next()){
+                this.P_ID=(rs.getInt("P_ID"));
+                if (rs.getString("POSITION") != null) this.position= (rs.getString("POSITION"));
+
+            }
+            else{
+                System.out.println("ERRO: Não existe Posição com o ID definido ");
+            }
+        } catch (SQLException ex) {
+            System.out.println("ERRO: " + ex.getMessage());
+        }
+
+    }
 
 }
