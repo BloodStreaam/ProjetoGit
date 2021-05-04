@@ -67,8 +67,8 @@ public class OrderService {
                 order.setO_id(rs.getInt("o_id"));
                 order.setOr_id(rs.getInt("or_id"));
                 order.setT_id(rs.getInt("t_id"));
-                order.setBill(rs.getString("bill"));
-                order.setInvoice(rs.getString("invoice"));
+                order.setBill(rs.getString("billing_address"));
+                order.setInvoice(rs.getString("invoice_address"));
                 order.setPayment_status(rs.getString("payment_status"));
             }
 

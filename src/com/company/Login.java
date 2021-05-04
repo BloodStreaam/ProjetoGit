@@ -20,8 +20,6 @@ public class Login extends JDialog {
     public Login() {
         setContentPane(contentPane);
         setModal(true);
-
-
         register.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

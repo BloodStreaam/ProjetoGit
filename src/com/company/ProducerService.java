@@ -12,6 +12,7 @@ public class ProducerService {
     private int phone;
     private String mail;
 
+
     public int getPROD_ID() {
         return PROD_ID;
     }

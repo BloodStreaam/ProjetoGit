@@ -57,8 +57,6 @@ public class ProducerManagement extends JDialog {
                 idProducer = jtable.getValueAt(jtable.getSelectedRow(),0).toString();
                 jEditCheck = true;
 
-
-
             }
         });
 

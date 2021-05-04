@@ -13,6 +13,7 @@ public class ProductsManagement extends JDialog {
     private JButton buttonOK;
     private JButton buttonCancel;
 
+
     public ProductsManagement() {
         setContentPane(contentPane);
         setModal(true);

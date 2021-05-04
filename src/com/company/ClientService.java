@@ -3,7 +3,6 @@ package com.company;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
 public class ClientService {
     //variaveis
     private int c_id;

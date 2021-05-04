@@ -73,7 +73,6 @@ public class EmployeesManagement extends JDialog {
         });
     }
     private void showEditInfoEmployee(){
-
     }
 
 

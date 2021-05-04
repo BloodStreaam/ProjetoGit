@@ -16,14 +16,6 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="8794e" class="javax.swing.JButton" binding="productsButton" default-binding="true">
-            <constraints>
-              <grid row="0" column="0" row-span="2" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Products"/>
-            </properties>
-          </component>
           <component id="47b61" class="javax.swing.JButton" binding="ordersButton" default-binding="true">
             <constraints>
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -86,6 +78,14 @@
             </constraints>
             <properties>
               <text value="Global View"/>
+            </properties>
+          </component>
+          <component id="8794e" class="javax.swing.JButton" binding="productsButton" default-binding="true">
+            <constraints>
+              <grid row="0" column="0" row-span="2" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Products"/>
             </properties>
           </component>
         </children>

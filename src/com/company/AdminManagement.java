@@ -51,7 +51,6 @@ public class AdminManagement extends JDialog {
                 jClientsManagement.setVisible(true);
             }
         });
-
         ordersButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

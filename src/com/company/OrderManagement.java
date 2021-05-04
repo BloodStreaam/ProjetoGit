@@ -20,7 +20,7 @@ public class OrderManagement extends JDialog {
     private JLabel clienteLabel;
     private JLabel addressLabel;
     private JLabel transportationLabel;
-    private JTextField text2;
+    private JTextField texts2;
     private JScrollPane scroll2;
     private JButton buttonOK;
     private JButton buttonCancel;

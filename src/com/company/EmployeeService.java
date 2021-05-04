@@ -109,7 +109,6 @@ public class EmployeeService {
         Connection conn = SQLConnection.criarConexao();
 
         String sqlCommand = "SELECT E_ID, NAME, BIRTHDATE, MAIL, PHONE, SALARY, P_ID, ADDRESS, ZIP FROM EMPLOYEE";
-
         List<EmployeeService> list = new ArrayList<>();
 
         try {

@@ -94,8 +94,6 @@ public class ClientsManagement extends JDialog {
 
         JTable jtable = new JTable(model);
         jtable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-
         return jtable;
     }
 
