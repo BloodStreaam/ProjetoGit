@@ -92,7 +92,7 @@ public class ClientsManagement extends JDialog {
             public void mousePressed(MouseEvent e) {
                 idClientSelected = jtable.getValueAt(jtable.getSelectedRow(),0).toString();
                 idClientConverted = Integer.parseInt(idClientSelected);
-                System.out.print(idClient);
+                System.out.print(idClientConverted);
                 showFullDetail(idClientConverted);
                 infoPanel.setVisible(true);
                 pack();
@@ -109,6 +109,7 @@ public class ClientsManagement extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 deleteClient();
+                jtable.revalidate();
             }
         });
         addB.addActionListener(new ActionListener() {
@@ -128,8 +129,8 @@ public class ClientsManagement extends JDialog {
     }
     private void showFullDetail(int id){
         ClientService client = new ClientService();
-        AddresService addres= new AddresService();
-        addres=readAdress(id);
+        AddresService addres;
+        addres=  readAdress(id);
 
         client.read(id);
         nameInfo.setText("Name: " + client.getName());
@@ -230,7 +231,8 @@ public class ClientsManagement extends JDialog {
        address=cli_addres.readAll();
 
         for(AddresService pos: address){
-            if(c_id==pos.getC_id()){
+            if(c_id == pos.getC_id()){
+                System.out.println(pos.getC_id());
                 return pos;
             }
         }
@@ -245,8 +247,7 @@ public class ClientsManagement extends JDialog {
         int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like to Delete this Client?","Warning",dialogButton);
         if(dialogResult == JOptionPane.YES_OPTION){
             deleteClient.delete(idClientConverted);
-            scroll2.getViewport().remove(jtable);
-            scroll2.getViewport().add(jtable=createJTable());
+            this.jtable.setModel(updateTableAfterAddDeleteUpdate());
         }
     }
     private void addClient() throws SQLException, ParseException {
@@ -258,7 +259,7 @@ public class ClientsManagement extends JDialog {
         dateSelected = year_box.getSelectedItem() + "-" + mounth_box.getSelectedItem() + "-" +  day_box.getSelectedItem();
         Date date1 = Date.valueOf(dateSelected);
 
-        addClient.create(in_name.getText(), date1, in_mail.getText(), Integer.parseInt(in_phone.getText()), in_street.getText(), in_zip.getText(), in_pass.getText());
+        addClient.create(in_name.getText(), date1, in_mail.getText(), Integer.parseInt(in_phone.getText()), in_street.getText(), Integer.parseInt(in_zip.getText()), Integer.parseInt(in_house.getText()), in_pass.getText(), idClientOnEdit);
 
         this.jtable.setModel(updateTableAfterAddDeleteUpdate());
 
@@ -274,6 +275,10 @@ public class ClientsManagement extends JDialog {
         model.addColumn("Name");
         model.addColumn("Bithdate");
         model.addColumn("Mail");
+
+        for(ClientService client: clients){
+            model.addRow(new Object[]{client.getName(), client.getName(), client.getBirthdate(), client.getMail()});
+        }
 
         return model;
 

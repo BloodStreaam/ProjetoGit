@@ -115,11 +115,11 @@ public class ClientService {
         }
     }
 
-    public void create(String name, Date birthdate, String mail, int phone, String address, String zip, String Pass) throws SQLException {
+    public void create(String name, Date birthdate, String mail, int phone, String address, int zip, int housenumber, String Pass, int cID) throws SQLException {
         Connection conn = SQLConnection.criarConexao();
 
-        String sqlCommand = "INSERT INTO CLIENT COLUMNS (NAME, BIRTHDATE, MAIL, PHONE, ADDRESS, ZIP, PASSWORD) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sqlCommand = "INSERT INTO CLIENT COLUMNS (NAME, BIRTHDATE, MAIL, PHONE, PASSWORD) "
+                + "VALUES (?, ?, ?, ?, ?)";
 
         PreparedStatement pst = conn.prepareStatement(sqlCommand);
 
@@ -127,10 +127,24 @@ public class ClientService {
         pst.setDate(2, birthdate);
         pst.setString(3, mail);
         pst.setInt(4, phone);
-        pst.setString(7, address);
-        pst.setString(8, zip);
-        pst.setString(9, Pass);
+        pst.setString(5, Pass);
         pst.execute();
+
+        String sqlCommandAddress = "INSERT INTO ADDRESS COLUMNS (A_ID, STREETNAME, HOUSENUMBER, C_ID, ZIP) "
+                + "VALUES (?, ?, ?, ?, ?)";
+
+        PreparedStatement pstAddress = conn.prepareStatement(sqlCommandAddress);
+
+        pstAddress.setInt(1, 21);
+        pstAddress.setString(2, address);
+        pstAddress.setInt(3, housenumber);
+        pstAddress.setInt(4, cID);
+        pstAddress.setInt(5, zip);
+
+        pstAddress.execute();
+
+
+
     }
 
 
