@@ -130,35 +130,40 @@ public class ProductService {
 
     public static List<ProductService> search(int typeid, String product) throws SQLException {
         Connection conn = SQLConnection.criarConexao();
-
+        System.out.println(typeid + product);
+        System.out.println(product.isEmpty());
         String sqlCommand = "SELECT PRODUCT_ID, RD_ID, FARM_ID, TYPE_ID, OR_ID, PRICE_UNI, PR_QUANTITY, PRODUCT_NAME FROM PRODUCTS ";
-        if(typeid != 0 && product.equals("")){
+        if(typeid != 0 && product.isEmpty()){
             sqlCommand+= "WHERE TYPE_ID = ? ";
         }
-        if(product.equals("") && typeid == 0){
-            sqlCommand+= "WHERE PRODUCT_ID = ? ";
+        if(!product.isEmpty() && typeid == 0){
+            sqlCommand+= "WHERE PRODUCT_NAME LIKE ? ";
         }
-        if(typeid != 0 && product.equals("")){
-            sqlCommand+="WHERE TYPE_ID = ? AND PRODUCT_NAME = ?";
+        if(typeid != 0 && !product.isEmpty()){
+            sqlCommand+="WHERE TYPE_ID = ? AND PRODUCT_NAME LIKE ? ";
         }
 
         sqlCommand+="ORDER BY PRODUCT_ID";
-
         List<ProductService> list = new ArrayList<>();
 
         try {
+
             PreparedStatement st = conn.prepareStatement(sqlCommand);
-            if(typeid != 0 && product.equals("")){
+
+            if(typeid != 0 && product.isEmpty()){
                 st.setInt(1, typeid);
             }
-            if(product.equals("") && typeid == 0){
-                st.setString(1, product);
+
+            if(product.isEmpty() == false && typeid == 0){
+
+                st.setString(1, "%" + product + "%");
+
             }
-            if(typeid != 0 && product.equals("")){
+
+            if(typeid != 0 && product.isEmpty() == false){
                 st.setInt(1, typeid);
                 st.setString(2, product);
             }
-
 
             ResultSet rs = st.executeQuery();
 

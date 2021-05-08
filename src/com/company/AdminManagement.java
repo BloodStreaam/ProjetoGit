@@ -20,6 +20,7 @@ public class AdminManagement extends JDialog {
     public static AdminManagement jAdminManagement;
     public static EmployeesManagement jEmployeesManagement;
     public static ClientsManagement jClientsManagement;
+    public static RestockManagement jRestockManagement;
 
     public AdminManagement() {
         setContentPane(contentPane);
@@ -48,6 +49,14 @@ public class AdminManagement extends JDialog {
                 jClientsManagement = new ClientsManagement();
                 jClientsManagement.pack();
                 jClientsManagement.setVisible(true);
+            }
+        });
+        restockButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jRestockManagement = new RestockManagement();
+                jRestockManagement.pack();
+                jRestockManagement.setVisible(true);
             }
         });
     }
