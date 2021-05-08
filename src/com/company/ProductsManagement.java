@@ -68,7 +68,7 @@ public class ProductsManagement extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     updateProduct();
-s
+                    jtable.revalidate();
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
@@ -100,6 +100,7 @@ s
             @Override
             public void actionPerformed(ActionEvent e) {
                 deleteProduct();
+                jtable.revalidate();
             }
         });
         addButton1.addActionListener(new ActionListener() {
@@ -107,6 +108,7 @@ s
             public void actionPerformed(ActionEvent e) {
                 try {
                     addProduct();
+                    jtable.revalidate();
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
@@ -125,9 +127,11 @@ s
             public void actionPerformed(ActionEvent e) {
                 try {
                     searchProducts();
-                    jtable.repaint();
+                    jtable.revalidate();
+
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
+
                 }
             }
         });
@@ -156,6 +160,7 @@ s
         int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like to Delete this Product?","Warning",dialogButton);
         if(dialogResult == JOptionPane.YES_OPTION){
             deleteProd.delete(idProductConverted);
+            this.jtable.setModel(updateTableAfterAddDeleteUpdate());
         }
     }
 
@@ -184,6 +189,7 @@ s
         }
 
         addProd.create(farm_id, type_id, Float.parseFloat(priceInput.getText()), Integer.parseInt(quantityInput.getText()), String.valueOf(nameInput.getText()));
+        this.jtable.setModel(updateTableAfterAddDeleteUpdate());
         clearInputs();
         editPanel.setVisible(false);
         pack();
@@ -220,6 +226,7 @@ s
 
         //Atualiza o produto com o id definido na tabela produtos
         updateProd.update(farm_id, type_id, Float.parseFloat(priceInput.getText()), Integer.parseInt(quantityInput.getText()), String.valueOf(nameInput.getText()), idProductOnEdit);
+        this.jtable.setModel(updateTableAfterAddDeleteUpdate());
         clearInputs();
         editPanel.setVisible(false);
         pack();
@@ -293,6 +300,18 @@ s
 
         products = ProductService.search(type_id,searchInput.getText());
 
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Name");
+        model.addColumn("Price");
+        model.addColumn("Quantity");
+
+
+        for (ProductService prod : products) {
+            model.addRow(new Object[]{prod.getProduct_id(), prod.getName(), prod.getPrice_un(), prod.getPr_quantity()});
+        }
+
+        this.jtable.setModel(model);
 
     }
 
@@ -378,7 +397,22 @@ s
         return jtable;
     }
 
+    private DefaultTableModel updateTableAfterAddDeleteUpdate(){
+        products = ProductService.readAll();
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Name");
+        model.addColumn("Price");
+        model.addColumn("Quantity");
 
+
+        for (ProductService prod : products) {
+            model.addRow(new Object[]{prod.getProduct_id(), prod.getName(), prod.getPrice_un(), prod.getPr_quantity()});
+        }
+
+
+      return model;
+    }
 
     public static void main(String[] args) {
         ProductsManagement dialog = new ProductsManagement();
