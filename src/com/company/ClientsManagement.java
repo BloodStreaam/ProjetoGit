@@ -27,7 +27,6 @@ public class ClientsManagement extends JDialog {
     private JComboBox year_box;
     private JButton saveB;
     private JButton addB;
-    private JTextField text2;
     private JTable jtable;
     private JScrollPane scroll2;
     private JPanel infoPanel;

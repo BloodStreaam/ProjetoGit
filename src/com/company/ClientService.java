@@ -10,10 +10,16 @@ public class ClientService {
     private String name;
     private Date birthdate;
     private String mail;
-
     private int phone;
+    private String password;
+
+
 
     //metodos
+
+
+    public String getPassword() {return password;}
+    public void setPassword(String password) {this.password = password;}
 
     public String getName() {return name;}
     public void setName(String name) {this.name = name;}
@@ -50,10 +56,11 @@ public class ClientService {
             while(rs.next()){
                 ClientService client = new ClientService();
                 client.setC_id(rs.getInt("C_ID"));
-                client.setO_id(rs.getInt("O_ID"));
                 if (rs.getString("NAME") != null) client.setName(rs.getString("NAME"));
                 if (rs.getDate("BIRTHDATE") != null) client.setBirthdate(rs.getDate("BIRTHDATE"));
                 if (rs.getString("MAIL") != null) client.setMail(rs.getString("MAIL"));
+                client.setPhone(rs.getInt("PHONE"));
+                if (rs.getString("PASSWORD") != null) client.setPassword(rs.getString("PASSWORD"));
                 //
                 list.add(client);
             }
@@ -74,7 +81,7 @@ public class ClientService {
                 if(rs.getString("NAME") != null) this.name= (rs.getString("NAME"));
                 if (rs.getString("MAIL") != null) this.mail=(rs.getString("MAIL"));
                 if (rs.getDate("BIRTHDATE") != null) this.birthdate=(rs.getDate("BIRTHDATE"));
-                this.o_id=(rs.getInt("O_ID"));
+                if (rs.getString("PASSWORD") != null) this.password=(rs.getString("PASSWORD"));
                 this.phone=(rs.getInt("PHONE"));
 
 
