@@ -71,6 +71,137 @@ public class EmployeesManagement extends JDialog {
             }
 
         });
+<<<<<<< Updated upstream
+=======
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+            }
+        });
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                deleteEmployee();
+            }
+        });
+
+        addButton1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    addEmployee();
+                } catch (SQLException | ParseException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        });
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    updateEmployee();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void showFullDetail(int idEmployee){
+        EmployeeService employee = new EmployeeService();
+        PositionService position = new PositionService();
+
+
+        employee.read(idEmployee);
+        position.readPosition(employee.getPosition_id());
+
+        nomeInfo.setText("Name: " + employee.getName());
+        emailInfo.setText("Email: " + employee.getMail());
+        phoneInfo.setText("Phone: " + employee.getPhone());
+        salaryInfo.setText("Salary: " + employee.getSalary());
+        addressInfo.setText("Address: " + employee.getAddress());
+        zipInfo.setText("Zip: " + employee.getZip());
+        positionInfo.setText("Position: " + position.getPosition());
+        birthdateInfo.setText("Birthdate: " + employee.getBirthdate());
+    }
+
+    private void showInfoEdit(int idEmployee){
+        idEmployeeOnEdit = idEmployee; //Guarda o ID do produto que está a ser editado para mais tarde ser usado no update
+        EmployeeService employee = new EmployeeService(); //Guarda o valor do produto selecionado
+
+        employee.read(idEmployee); //lê o produto que tem o id indicado
+        positions = PositionService.readAll(); //lê todos os tipos que estão na tabela Type
+        System.out.println(employee.getName());
+        nameField1.setText(employee.getName());
+        emailField.setText(String.valueOf(employee.getMail()));
+        phoneField.setText(String.valueOf(employee.getPhone()));
+        salaryField.setText(String.valueOf(employee.getSalary()));
+        addressField.setText(employee.getAddress());
+        zipField.setText(String.valueOf(employee.getZip()));
+
+        //Adiciona os tipos a combo box
+        for (PositionService position: positions) {
+            positionBox.addItem(position.getPosition());
+            //Seleciona o tipo baseado no id que o produto tem
+            if(position.getP_ID() == employee.getPosition_id()){
+                positionBox.setSelectedItem(position.getPosition());
+            }
+        }
+        String date= String.valueOf(employee.getBirthdate());
+        String [] dateParts = date.split("-");
+        String day = dateParts[2];
+        String month = dateParts[1];
+        String year = dateParts[0];
+
+        for(int i = 1; i<=31; i++){
+            System.out.println("I: " + i + " Day: " + day);
+            dayBox.addItem(i);
+            if(i == Integer.parseInt(day)){
+                dayBox.setSelectedItem(i);
+            }
+        }
+
+        for(int i = 1; i<=12; i++){
+            monthBox.addItem(i);
+            if(i == Integer.parseInt(month)){
+                monthBox.setSelectedItem(i);
+            }
+        }
+
+        for(int i = 1940; i<=2021; i++){
+            yearBox.addItem(i);
+            if(i == Integer.parseInt(year)){
+                yearBox.setSelectedItem(i);
+            }
+        }
+
+
+
+    }
+
+    private void fillAddAreaComboboxes(){
+        positions = PositionService.readAll(); //lê todos os tipos que estão na tabela Type
+         //lê todas as quintas que estão na tabela Farms
+
+        for (PositionService position : positions) {
+            positionBox.addItem(position.getPosition());
+        }
+
+        for(int i = 1; i<=31; i++){
+            dayBox.addItem(i);
+        }
+
+        for(int i = 1; i<=12; i++){
+            monthBox.addItem(i);
+        }
+
+        for(int i = 1940; i<=2021; i++){
+            yearBox.addItem(i);
+        }
+
+
+>>>>>>> Stashed changes
     }
     private void showEditInfoEmployee(){
     }

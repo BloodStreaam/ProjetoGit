@@ -17,7 +17,15 @@ public class ProductsManagement extends JDialog {
     public ProductsManagement() {
         setContentPane(contentPane);
         setModal(true);
+<<<<<<< Updated upstream
         getRootPane().setDefaultButton(buttonOK);
+=======
+        jscrollpane1.getViewport().add(jtable=createJTable());
+        fillSearchCombobox();
+        editPanel.setVisible(false);
+        infoPanel.setVisible(false);
+
+>>>>>>> Stashed changes
 
         backButton.addActionListener(new ActionListener() {
             @Override

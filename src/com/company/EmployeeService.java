@@ -113,8 +113,6 @@ public class EmployeeService {
 
         try {
             PreparedStatement st = conn.prepareStatement(sqlCommand);
-
-
             ResultSet rs = st.executeQuery();
 
             while(rs.next()){
@@ -193,8 +191,6 @@ public class EmployeeService {
         try {
             PreparedStatement st = conn.prepareStatement(sqlCommand);
             st.setInt(1, idEmployee);
-
-
             ResultSet rs = st.executeQuery();
 
             if(rs.next()){

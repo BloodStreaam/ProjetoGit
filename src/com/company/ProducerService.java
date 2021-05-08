@@ -65,5 +65,76 @@ public class ProducerService {
     }
 
 
+    public void read(int idEmployee){
+        Connection conn = SQLConnection.criarConexao();
+        String sqlCommand="SELECT * FROM PRODUCER WHERE PROD_ID= ?";
+        try{
+            PreparedStatement st = conn.prepareStatement(sqlCommand);
+            st.setInt(1, idEmployee);
+            ResultSet rs = st.executeQuery();
+            if(rs.next()){
+                this.PROD_ID=(rs.getInt("PROD_ID"));
+                if(rs.getString("NAME") != null) this.name= (rs.getString("NAME"));
+                if (rs.getString("MAIL") != null) this.mail=(rs.getString("MAIL"));
+                if (rs.getString("PHONE") != null) this.phone=(rs.getInt("PHONE"));
+            }else{
+
+                System.out.println("Erro: Não existe Producer com o id Definido");
+            }
+
+
+        }catch(SQLException ex) {
+            System.out.println("ERRO: " + ex.getMessage());
+        }
+
+
+
+
+    }
+    public void create(String name, String mail, int phone) throws SQLException {
+
+        Connection conn = SQLConnection.criarConexao();
+
+        String sqlCommand = "INSERT INTO PRODUCER COLUMNS (NAME, MAIL, PHONE) "
+                + "VALUES (?, ?, ?)";
+        PreparedStatement pst = conn.prepareStatement(sqlCommand);
+
+        pst.setString(1, name);
+        pst.setString(2, mail);
+        pst.setInt(3, phone);
+        pst.execute();
+    }
+
+    public void update(String name, String mail, int phone, int prod_id ) throws SQLException {
+        Connection conn = SQLConnection.criarConexao();
+
+        String sqlCommand = "UPDATE PRODUCER SET NAME = ?, MAIL = ?, PHONE = ? WHERE PROD_ID = ?";
+        PreparedStatement pst = conn.prepareStatement(sqlCommand);
+
+
+        pst.setString(1, name);
+        pst.setString(2, mail);
+        pst.setInt(3, phone);
+        pst.setInt(4, prod_id);
+        pst.execute();
+    }
+    public void delete(int id){
+
+        Connection conn = SQLConnection.criarConexao();
+
+        String sqlCommand = "DELETE PRODUCER WHERE PROD_ID = ?";
+
+        try {
+            PreparedStatement st = conn.prepareStatement(sqlCommand);
+            st.setInt(1, id);
+            st.execute();
+
+        } catch (SQLException ex) {
+            System.out.println("ERRO: " + ex.getMessage());
+        }
+    }
+
+
+
 
 }
