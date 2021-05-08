@@ -68,7 +68,7 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <component id="aff93" class="javax.swing.JTextField" binding="text2">
+                  <component id="aff93" class="javax.swing.JTextField" binding="texts2">
                     <constraints/>
                     <properties/>
                   </component>

@@ -4,7 +4,6 @@ import javax.swing.text.Position;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
 public class PositionService{
     private int P_ID;
     private String position;

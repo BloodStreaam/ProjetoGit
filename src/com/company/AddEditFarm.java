@@ -22,7 +22,6 @@ public class AddEditFarm extends JDialog {
                 onOK();
             }
         });
-
         buttonCancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onCancel();

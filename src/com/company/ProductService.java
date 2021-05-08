@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductService {
-
     private int product_id;
     private int rd_id;
     private int farm_id;
