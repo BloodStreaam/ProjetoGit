@@ -68,7 +68,7 @@ public class ReqRestockService {
     public void read(int idReqRestock){
         Connection conn = SQLConnection.criarConexao();
 
-        String sqlCommand = "SELECT REQ_ID, E_ID, REQ_DATE FROM REQ_EMPLOYEE WHERE REQ_ID = ?";
+        String sqlCommand = "SELECT REQ_ID, E_ID, REQ_DATE FROM REQ_RESTOCK WHERE REQ_ID = ?";
 
         try {
             PreparedStatement st = conn.prepareStatement(sqlCommand);
@@ -84,7 +84,7 @@ public class ReqRestockService {
 
             }
             else{
-                System.out.println("ERRO: Não existe Cliente com o ID definido ");
+                System.out.println("ERRO: Não existe Requisito com o ID definido ");
             }
         } catch (SQLException ex) {
             System.out.println("ERRO: " + ex.getMessage());

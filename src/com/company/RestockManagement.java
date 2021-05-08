@@ -47,7 +47,7 @@ public class RestockManagement extends JDialog {
         setContentPane(contentPane);
         setModal(true);
 
-        scrollpanel.getViewport().add(jtableReqRestock=createJTableReqRestock());
+
         scrollpanel.getViewport().add(jtableRestock=createJTableRestock());
         jtableReqRestock.setVisible(false);
         showRestocksButton.setVisible(false);
@@ -197,47 +197,7 @@ public class RestockManagement extends JDialog {
         return jtable;
     }
 
-    private static JTable createJTableReqRestock() {
-        reqs_restock = ReqRestockService.readAll();
-        restockDetails = RestockDetailsService.readAll();
-        int precoTotal = 0;
-        int nProdutos = 0;
-        DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("ID");
-        model.addColumn("Nº Products");
-        model.addColumn("Price");
-        model.addColumn("Date");
 
-
-
-        for (ReqRestockService reqRestock : reqs_restock) {
-            precoTotal = 0;
-            nProdutos = 0;
-            for(RestockDetailsService restockDetail: restockDetails){
-                System.out.println(restockDetail.getR_id());
-                if(restockDetail.getReq_id() == reqRestock.getReq_id()){
-                    precoTotal +=  restockDetail.getPrice();
-                    nProdutos++;
-                }
-
-            }
-            model.addRow(new Object[]{reqRestock.getReq_id(), nProdutos , precoTotal, reqRestock.getReq_date()});
-
-        }
-
-
-        // for(EmployeeService emp : employees)
-
-            /*values.add(new String[] { String.valueOf(emp.getE_id()),  emp.getName(),  String.valueOf(emp.getBirthdate()),
-                    emp.getMail(),  String.valueOf(emp.getPhone()),  String.valueOf(emp.getSalary()), emp.getAddress(), emp.getZip() });
-*/
-        JTable jtable = new JTable(model);
-        jtable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-
-
-        return jtable;
-    }
 
 
     public static void main(String[] args) {

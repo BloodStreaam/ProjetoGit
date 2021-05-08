@@ -132,5 +132,39 @@ public class RestockDetailsService {
 
     }
 
+    public static List<RestockDetailsService> readReq(int idRestockDetail){
+        Connection conn = SQLConnection.criarConexao();
+
+        String sqlCommand = "SELECT RD_ID, QUANTITY, PRICE, P_ID, R_ID, REQ_ID FROM RESTOCK_DETAILS WHERE REQ_ID = ?";
+        List<RestockDetailsService> list = new ArrayList<>();
+
+        try {
+            PreparedStatement st = conn.prepareStatement(sqlCommand);
+            st.setInt(1, idRestockDetail);
+
+            ResultSet rs = st.executeQuery();
+
+            while(rs.next()){
+                RestockDetailsService restockDetail = new RestockDetailsService();
+
+                restockDetail.setRd_id(rs.getInt("RD_ID"));
+                restockDetail.setQuantity(rs.getInt("QUANTITY"));
+                restockDetail.setPrice(rs.getFloat("PRICE"));
+                restockDetail.setP_id(rs.getInt("P_ID"));
+                restockDetail.setR_id(rs.getInt("R_ID"));
+                restockDetail.setReq_id(rs.getInt("REQ_ID"));
+
+                list.add(restockDetail);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERRO: " + ex.getMessage());
+        }
+
+        return list;
+
+    }
+
+
 
 }

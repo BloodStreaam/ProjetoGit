@@ -1,7 +1,9 @@
 package com.company;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
+import java.util.List;
 
 public class ReqRestockManagement extends JDialog {
     private JPanel contentPane;
@@ -11,48 +13,205 @@ public class ReqRestockManagement extends JDialog {
     private JButton editButton;
     private JButton deleteButton;
     private JButton backButton;
+    private JTextField employeeField;
+    private JTextField dateField;
+    private JComboBox farmBox;
+    private JComboBox productBox;
+    private JButton addButton1;
+    private JButton saveButton;
+    private JLabel idInfo;
+    private JLabel employeeInfo;
+    private JScrollPane scrollpanel;
+    private JScrollPane scrollpanel1;
+    private JLabel dateInfo;
+    private JLabel tpriceInfo;
+    private JPanel infoPanel;
+    private JPanel editPanel;
+    private JPanel panelInfo;
+    private static JTable jtable;
+    private static JTable jtableProducts;
+    private static List<RestockDetailsService> restockDetails;
+    private static List<RestockService> restocks;
+    private static List<ReqRestockService> reqs_restock;
+    private static List<FarmService> farms;
+    private static List<ProductService> products;
+    private static String idReqRestockSelected;
+    private static int idReqRestockConverted;
+    private static int idReqRestockOnEdit;
+
 
     public ReqRestockManagement() {
         setContentPane(contentPane);
         setModal(true);
-        getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onOK();
+        editPanel.setVisible(false);
+        infoPanel.setVisible(false);
+        scrollpanel1.getViewport().add( jtable=createJTableReqRestock());
+
+        jtable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                idReqRestockSelected = jtable.getValueAt(jtable.getSelectedRow(),0).toString();
+                idReqRestockConverted = Integer.parseInt(idReqRestockSelected);
+                System.out.println(idReqRestockConverted);
+                showFullDetail(idReqRestockConverted);
+                infoPanel.setVisible(true);
+
+                pack();
+
             }
+
         });
 
-        buttonCancel.addActionListener(new ActionListener() {
+        editButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                onCancel();
+                showInfoEdit(idReqRestockConverted);
+                saveButton.setVisible(true);
+                addButton1.setVisible(false);
+                editPanel.setVisible(true);
+                pack();
             }
         });
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onCancel();
+        farmBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                changeProducts();
             }
         });
-
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    private void onOK() {
-        // add your code here
-        dispose();
+    private static JTable createJTableReqRestock() {
+        reqs_restock = ReqRestockService.readAll();
+        restockDetails = RestockDetailsService.readAll();
+        int precoTotal = 0;
+        int nProdutos = 0;
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Nº Products");
+        model.addColumn("Price");
+        model.addColumn("Date");
+
+
+
+        for (ReqRestockService reqRestock : reqs_restock) {
+            precoTotal = 0;
+            nProdutos = 0;
+            for(RestockDetailsService restockDetail: restockDetails){
+                System.out.println(restockDetail.getR_id());
+                if(restockDetail.getReq_id() == reqRestock.getReq_id()){
+                    precoTotal +=  restockDetail.getPrice();
+                    nProdutos++;
+                }
+
+            }
+            model.addRow(new Object[]{reqRestock.getReq_id(), nProdutos , precoTotal, reqRestock.getReq_date()});
+
+        }
+
+
+        // for(EmployeeService emp : employees)
+
+            /*values.add(new String[] { String.valueOf(emp.getE_id()),  emp.getName(),  String.valueOf(emp.getBirthdate()),
+                    emp.getMail(),  String.valueOf(emp.getPhone()),  String.valueOf(emp.getSalary()), emp.getAddress(), emp.getZip() });
+*/
+        JTable jtable = new JTable(model);
+        jtable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+
+
+        return jtable;
     }
 
-    private void onCancel() {
-        // add your code here if necessary
-        dispose();
+    private void showFullDetail(int idReqRestock){
+        ReqRestockService reqRestock = new ReqRestockService();
+        EmployeeService employee = new EmployeeService();
+        ProductService product = new ProductService();
+        float totalPrice = 0;
+
+
+
+        reqRestock.read(idReqRestock);
+        System.out.println(reqRestock.getE_id());
+        System.out.println("xau");
+        employee.read(reqRestock.getE_id());
+        System.out.println("oi");
+        restockDetails = RestockDetailsService.readReq(reqRestock.getReq_id());
+
+
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("Name");
+        model.addColumn("Quantity");
+        model.addColumn("Price");
+
+
+
+        for(RestockDetailsService detail : restockDetails){
+            product.read(detail.getP_id());
+            totalPrice+=detail.getPrice();
+            model.addRow(new Object[]{product.getName(), detail.getQuantity() , detail.getPrice()});
+
+        }
+
+        JTable jtable = new JTable(model);
+
+
+        scrollpanel.getViewport().add(jtableProducts=jtable);
+
+
+
+        idInfo.setText("ID: " + reqRestock.getReq_id());
+        employeeInfo.setText("Employee: " + employee.getName());
+        dateInfo.setText(String.valueOf("Date: " + reqRestock.getReq_date()));
+        tpriceInfo.setText(String.valueOf("Total Price: " + totalPrice + "€"));
+
+
+    }
+
+    private void showInfoEdit(int id){
+        idReqRestockOnEdit= id; //Guarda o ID do produto que está a ser editado para mais tarde ser usado no update
+        EmployeeService employee = new EmployeeService();
+        ReqRestockService reqRestock = new ReqRestockService();
+
+
+        farms = FarmService.readAllFarms();
+        products = ProductService.readAll();
+
+        reqRestock.read(id); //lê o produto que tem o id indicado
+        employee.read(reqRestock.getE_id());
+        employeeField.setText(employee.getName());
+        dateField.setText(String.valueOf(reqRestock.getReq_date()));
+
+        for(FarmService farm: farms){
+            farmBox.addItem(farm.getName());
+            for(ProductService product: products){
+                if(farm.getIdFarm() == product.getFarm_id()){
+                    productBox.addItem(product.getName());
+                }
+            }
+        }
+
+
+    }
+
+    private void changeProducts(){
+        farms = FarmService.readAllFarms();
+        products = ProductService.readAll();
+
+
+
+        System.out.println(farmBox.getSelectedItem());
+        productBox.removeAllItems();
+        for(FarmService farm: farms){
+            if(farm.getName().equals(farmBox.getSelectedItem())){
+                for(ProductService product: products){
+                    if(farm.getIdFarm() == product.getFarm_id()){
+                        productBox.addItem(product.getName());
+                    }
+                }
+            }
+        }
+
     }
 
     public static void main(String[] args) {
