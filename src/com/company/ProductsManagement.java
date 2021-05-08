@@ -68,7 +68,7 @@ public class ProductsManagement extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     updateProduct();
-
+s
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
