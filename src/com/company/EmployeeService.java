@@ -15,7 +15,15 @@ public class EmployeeService {
     private int phone;
     private float salary;
     private int position_id;
+    public int loggedEmployeeID;
 
+    public int getLoggedEmployeeID() {
+        return loggedEmployeeID;
+    }
+
+    public void setLoggedEmployeeID(int loggedEmployeeID) {
+        this.loggedEmployeeID = loggedEmployeeID;
+    }
 
     public int getE_id() {return e_id;}
     public void setIdEmployee(int e_id) {
@@ -118,6 +126,68 @@ public class EmployeeService {
         }
     }
 
+    public static List<EmployeeService> search(int positionid, String employ) throws SQLException {
+        Connection conn = SQLConnection.criarConexao();
+
+
+        String sqlCommand = "SELECT E_ID, NAME, BIRTHDATE, MAIL, PHONE, SALARY, P_ID, ADDRESS, ZIP FROM EMPLOYEE ";
+        if(positionid != 0 && employ.isEmpty()){
+            sqlCommand+= "WHERE P_ID = ? ";
+        }
+        if(!employ.isEmpty() && positionid == 0){
+            sqlCommand+= "WHERE NAME LIKE ? ";
+        }
+        if(positionid != 0 && !employ.isEmpty()){
+            sqlCommand+="WHERE P_ID = ? AND NAME LIKE ? ";
+        }
+
+        sqlCommand+="ORDER BY E_ID";
+        System.out.println(sqlCommand);
+        List<EmployeeService> list = new ArrayList<>();
+
+        try {
+
+            PreparedStatement st = conn.prepareStatement(sqlCommand);
+
+            if(positionid != 0 && employ.isEmpty()){
+                st.setInt(1, positionid);
+            }
+
+            if(employ.isEmpty() == false && positionid == 0){
+                st.setString(1, "%" + employ + "%");
+            }
+
+            if(positionid != 0 && employ.isEmpty() == false){
+                st.setInt(1, positionid);
+                st.setString(2, employ);
+            }
+
+            ResultSet rs = st.executeQuery();
+
+            while(rs.next()){
+                EmployeeService employee = new EmployeeService();
+
+                employee.setIdEmployee(rs.getInt("E_ID"));
+                if (rs.getString("NAME") != null) employee.setName(rs.getString("NAME"));
+                if (rs.getDate("BIRTHDATE") != null) employee.setBirthdate(rs.getDate("BIRTHDATE"));
+                if (rs.getString("MAIL") != null) employee.setMail(rs.getString("MAIL"));
+                //
+                employee.setPhone(rs.getInt("PHONE"));
+                //
+                employee.setSalary(rs.getFloat("SALARY"));
+                employee.setPosition_id(rs.getInt("P_ID"));
+                if (rs.getString("ADDRESS") != null) employee.setAddress(rs.getString("ADDRESS"));
+                if (rs.getString("ZIP") != null) employee.setZip(rs.getString("ZIP"));
+                list.add(employee);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERRO: " + ex.getMessage());
+        }
+
+        return list;
+    }
+
     public void read(int idEmployee){
         Connection conn = SQLConnection.criarConexao();
 
@@ -152,6 +222,42 @@ public class EmployeeService {
         }
 
     }
+
+    public void readEmployeeEmail(String email) throws SQLException {
+        Connection conn = SQLConnection.criarConexao();
+
+        String sqlCommand = "SELECT E_ID, NAME, BIRTHDATE, MAIL, PHONE, SALARY, P_ID, ADDRESS, ZIP FROM EMPLOYEE WHERE to_char(MAIL) = ?";
+
+        try {
+            PreparedStatement st = conn.prepareStatement(sqlCommand);
+            st.setString(1, email);
+
+
+            ResultSet rs = st.executeQuery();
+
+            if(rs.next()){
+                this.e_id=(rs.getInt("E_ID"));
+                if (rs.getString("NAME") != null) this.name= (rs.getString("NAME"));
+                if (rs.getDate("BIRTHDATE") != null) this.birthdate= (rs.getDate("BIRTHDATE"));
+                if (rs.getString("MAIL") != null) this.mail=(rs.getString("MAIL"));
+                //
+                this.phone=(rs.getInt("PHONE"));
+                //
+                this.salary=(rs.getFloat("SALARY"));
+                this.position_id=(rs.getInt("P_ID"));
+                if (rs.getString("ADDRESS") != null) this.address=(rs.getString("ADDRESS"));
+                if (rs.getString("ZIP") != null) this.zip= (rs.getString("ZIP"));
+
+            }
+            else{
+                System.out.println("ERRO: Não existe Employee com o ID definido ");
+            }
+        } catch (SQLException ex) {
+            System.out.println("ERRO: " + ex.getMessage());
+        }
+
+    }
+
 
     public void create(String name, Date birthdate, String mail, int phone, float salary, int p_id, String address, String zip) throws SQLException {
         Connection conn = SQLConnection.criarConexao();

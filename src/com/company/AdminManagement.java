@@ -20,8 +20,8 @@ public class AdminManagement extends JDialog {
     public static AdminManagement jAdminManagement;
     public static EmployeesManagement jEmployeesManagement;
     public static ClientsManagement jClientsManagement;
-    public static OrderManagement jOrderManagement;
-    public static ProducerManagement jProducerManagement;
+    public static RestockManagement jRestockManagement;
+
     public AdminManagement() {
         setContentPane(contentPane);
         setModal(true);
@@ -51,25 +51,14 @@ public class AdminManagement extends JDialog {
                 jClientsManagement.setVisible(true);
             }
         });
-
-        ordersButton.addActionListener(new ActionListener() {
+        restockButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                jOrderManagement = new OrderManagement();
-                jOrderManagement.pack();
-                jOrderManagement.setVisible(true);
+                jRestockManagement = new RestockManagement();
+                jRestockManagement.pack();
+                jRestockManagement.setVisible(true);
             }
         });
-
-        producersButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                jProducerManagement = new ProducerManagement();
-                jProducerManagement.pack();
-                jProducerManagement.setVisible(true);
-            }
-        });
-
     }
 
 

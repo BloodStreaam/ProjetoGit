@@ -37,8 +37,8 @@ public class EmployeesManagement extends JDialog {
     private JLabel zipInfo;
     private JLabel birthdateInfo;
     private JLabel positionInfo;
-    private JComboBox comboBox1;
-    private JTextField textField1;
+    private JComboBox positionSearchBox;
+    private JTextField searchInput;
     private JButton searchButton;
     private JButton saveButton;
     private JButton addButton1;
@@ -63,6 +63,7 @@ public class EmployeesManagement extends JDialog {
         setModal(true);
 
         scrollPane1.getViewport().add(jtable=createJTable());
+        fillSearchCombobox();
         editPanel.setVisible(false);
         infoPanel.setVisible(false);
 
@@ -121,6 +122,7 @@ public class EmployeesManagement extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 deleteEmployee();
+                jtable.revalidate();
             }
         });
 
@@ -129,6 +131,7 @@ public class EmployeesManagement extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     addEmployee();
+                    jtable.revalidate();
                 } catch (SQLException | ParseException throwables) {
                     throwables.printStackTrace();
                 }
@@ -139,6 +142,18 @@ public class EmployeesManagement extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     updateEmployee();
+                    jtable.revalidate();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        });
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    searchEmployee();
+                    jtable.revalidate();
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
@@ -241,6 +256,15 @@ public class EmployeesManagement extends JDialog {
 
     }
 
+    private void fillSearchCombobox(){
+        positions = PositionService.readAll(); //lê todos os tipos que estão na tabela Type
+
+        positionSearchBox.addItem("No Filter");
+        for (PositionService position : positions) {
+            positionSearchBox.addItem(position.getPosition());
+        }
+    }
+
     private void clearInputs(){
         List<JTextField> tfList = new ArrayList<JTextField>();
         List<JComboBox> cbList = new ArrayList<JComboBox>();
@@ -276,8 +300,7 @@ public class EmployeesManagement extends JDialog {
         int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like to Delete this Employee?","Warning",dialogButton);
         if(dialogResult == JOptionPane.YES_OPTION){
             deleteEmp.delete(idEmployeeConverted);
-            scrollPane1.getViewport().remove(jtable);
-            scrollPane1.getViewport().add(jtable=createJTable());
+            this.jtable.setModel(updateTableAfterAddDeleteUpdate());
         }
     }
 
@@ -300,8 +323,7 @@ public class EmployeesManagement extends JDialog {
 
         addEmp.create(nameField1.getText(), date1, emailField.getText(), Integer.parseInt(phoneField.getText()), Float.parseFloat(salaryField.getText()),position_id, addressField.getText(), zipField.getText());
 
-        scrollPane1.getViewport().remove(jtable);
-        scrollPane1.getViewport().add(jtable=createJTable());
+        this.jtable.setModel(updateTableAfterAddDeleteUpdate());
 
         clearInputs();
         editPanel.setVisible(false);
@@ -330,11 +352,69 @@ public class EmployeesManagement extends JDialog {
 
         //Atualiza o produto com o id definido na tabela produtos
         updateEmployee.update(nameField1.getText(), date1, emailField.getText(), Integer.parseInt(phoneField.getText()), Float.parseFloat(salaryField.getText()),position_id, addressField.getText(), zipField.getText(), idEmployeeOnEdit);
-        scrollPane1.getViewport().remove(jtable);
-        scrollPane1.getViewport().add(jtable=createJTable());
+        this.jtable.setModel(updateTableAfterAddDeleteUpdate());
         clearInputs();
         editPanel.setVisible(false);
         pack();
+
+    }
+
+    private void searchEmployee() throws SQLException {
+        int position_id = 0;
+        String employeePosition = "";
+
+        positions = PositionService.readAll(); //lê todos os tipos que estão na tabela Type
+
+        for (PositionService position : positions) {
+            if(position.getPosition().equals(positionSearchBox.getSelectedItem())){
+                position_id = position.getP_ID();
+            }
+        }
+
+        employees = EmployeeService.search(position_id,searchInput.getText());
+
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Name");
+        model.addColumn("Position");
+        model.addColumn("Mail");
+
+
+        for(EmployeeService emp : employees) {
+            for(PositionService pos: positions){
+                if(emp.getPosition_id() == pos.getP_ID()){
+                    employeePosition = pos.getPosition();
+                }
+            }
+            model.addRow(new Object[] {emp.getE_id(), emp.getName(), employeePosition , emp.getMail()});
+        }
+
+        this.jtable.setModel(model);
+
+    }
+
+    private DefaultTableModel updateTableAfterAddDeleteUpdate(){
+        employees = EmployeeService.readAll();
+        positions = PositionService.readAll();
+        String employeePosition = "";
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Name");
+        model.addColumn("Position");
+        model.addColumn("Mail");
+
+
+
+        for(EmployeeService emp : employees) {
+            for(PositionService pos: positions){
+                if(emp.getPosition_id() == pos.getP_ID()){
+                    employeePosition = pos.getPosition();
+                }
+            }
+            model.addRow(new Object[] {emp.getE_id(), emp.getName(), employeePosition , emp.getMail()});
+        }
+
+        return model;
 
     }
 
@@ -363,22 +443,16 @@ public class EmployeesManagement extends JDialog {
             model.addRow(new Object[] {emp.getE_id(), emp.getName(), employeePosition , emp.getMail()});
         }
 
-
-
-
-
-       // for(EmployeeService emp : employees)
-
-            /*values.add(new String[] { String.valueOf(emp.getE_id()),  emp.getName(),  String.valueOf(emp.getBirthdate()),
-                    emp.getMail(),  String.valueOf(emp.getPhone()),  String.valueOf(emp.getSalary()), emp.getAddress(), emp.getZip() });
-*/
-
         JTable jtable = new JTable(model);
         jtable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 
         return jtable;
     }
+
+
+
+
 
     public static void main(String[] args) {
 
