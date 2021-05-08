@@ -3,6 +3,9 @@ package com.company;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
+import java.sql.Date;
+import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,13 +17,12 @@ public class ClientsManagement extends JDialog {
     public static boolean jEditCheck = false;
     private JButton deleteButton;
     private JButton backButton;
-    private JComboBox comboBox1;
     private JTextField textField1;
     private JButton sButton;
     private JTextField in_name;
     private JTextField in_mail;
     private JTextField in_phone;
-    private JTextField in_address;
+    private JTextField in_street;
     private JTextField in_zip;
     private JComboBox day_box;
     private JComboBox mounth_box;
@@ -37,9 +39,12 @@ public class ClientsManagement extends JDialog {
     private JLabel birthInfo;
     private JLabel adressInfo;
     private JLabel zipInfo;
+    private JTextField in_pass;
+    private JTextField in_house;
     private JButton buttonOK;
     private JButton buttonCancel;
     private static List<ClientService> clients;
+    private static List<AddresService> address;
     public static String idClient;
     public static ClientsManagement JClient;
     public static String idClientSelected;
@@ -106,17 +111,33 @@ public class ClientsManagement extends JDialog {
                 deleteClient();
             }
         });
+        addB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    addClient();
+                    jtable.revalidate();
+                } catch (SQLException | ParseException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        });
 
 
 
     }
     private void showFullDetail(int id){
         ClientService client = new ClientService();
+        AddresService addres= new AddresService();
+        addres=readAdress(id);
+
         client.read(id);
         nameInfo.setText("Name: " + client.getName());
         mailInfo.setText("Email: "+ client.getMail());
-        //phoneInfo.setText("Phone: "+ client.);
+        phoneInfo.setText("Phone: "+ client.getPhone());
         birthInfo.setText("Birthdate" + client.getBirthdate());
+        adressInfo.setText("Address: "+ addres.getStreetname()+ " " + addres.getHousenumber());
+        zipInfo.setText("zip: "+ addres.getZip());
 
 
     }
@@ -148,6 +169,7 @@ public class ClientsManagement extends JDialog {
         jtable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         return jtable;
     }
+
     private void showInfoEdit(int id){
         idClientOnEdit= id; //Guarda o ID do produto que está a ser editado para mais tarde ser usado no update
         ClientService client = new ClientService();
@@ -202,6 +224,20 @@ public class ClientsManagement extends JDialog {
 
 
     }
+    private AddresService readAdress(int c_id){
+       AddresService cli_addres= new AddresService();
+
+       address=cli_addres.readAll();
+
+        for(AddresService pos: address){
+            if(c_id==pos.getC_id()){
+                return pos;
+            }
+        }
+        return null;
+    }
+
+
     private void deleteClient(){
         int dialogButton = JOptionPane.YES_NO_OPTION;
         ClientService deleteClient = new ClientService();
@@ -212,6 +248,35 @@ public class ClientsManagement extends JDialog {
             scroll2.getViewport().remove(jtable);
             scroll2.getViewport().add(jtable=createJTable());
         }
+    }
+    private void addClient() throws SQLException, ParseException {
+        String dateSelected;
+
+        ClientService addClient = new ClientService(); //Para correr a função create() que se encontra o file ProductService
+
+
+        dateSelected = year_box.getSelectedItem() + "-" + mounth_box.getSelectedItem() + "-" +  day_box.getSelectedItem();
+        Date date1 = Date.valueOf(dateSelected);
+
+        addClient.create(in_name.getText(), date1, in_mail.getText(), Integer.parseInt(in_phone.getText()), in_street.getText(), in_zip.getText(), in_pass.getText());
+
+        this.jtable.setModel(updateTableAfterAddDeleteUpdate());
+
+        clearInputs();
+        editPanel.setVisible(false);
+        pack();
+
+    }
+    private DefaultTableModel updateTableAfterAddDeleteUpdate(){
+        clients = ClientService.readAll();
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Name");
+        model.addColumn("Bithdate");
+        model.addColumn("Mail");
+
+        return model;
+
     }
     public static void main(String[] args) {
 
