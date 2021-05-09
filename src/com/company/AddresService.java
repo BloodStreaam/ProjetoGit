@@ -85,5 +85,36 @@ public class AddresService {
         return list;
     }
 
+    /*public void read(int idClient){
+        Connection conn = SQLConnection.criarConexao();
+        String sqlCommand="SELECT A_ID, STREETNAME, HOUSENUMBER, C_ID, ZIP FROM ADDRESS WHERE C_ID= ?";
+        try{
+            PreparedStatement st = conn.prepareStatement(sqlCommand);
+            st.setInt(1, idClient);
+            ResultSet rs = st.executeQuery();
+            if(rs.next()){
+                this.c_id=(rs.getInt("C_ID"));
+                if(rs.getString("STREETNAME") != null) this.name= (rs.getString("NAME"));
+                if (rs.getString("MAIL") != null) this.mail=(rs.getString("MAIL"));
+                if (rs.getDate("BIRTHDATE") != null) this.birthdate=(rs.getDate("BIRTHDATE"));
+                if (rs.getString("PASSWORD") != null) this.password=(rs.getString("PASSWORD"));
+                this.phone=(rs.getInt("PHONE"));
+
+
+            }else{
+
+                System.out.println("Erro: Não existe Client com o ID Definido");
+            }
+
+
+        }catch(SQLException ex) {
+            System.out.println("ERRO: " + ex.getMessage());
+        }
+
+
+
+
+    }*/
+
 
 }

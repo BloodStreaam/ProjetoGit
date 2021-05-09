@@ -90,12 +90,13 @@ public class ClientsManagement extends JDialog {
         jtable.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                pack();
                 idClientSelected = jtable.getValueAt(jtable.getSelectedRow(),0).toString();
                 idClientConverted = Integer.parseInt(idClientSelected);
                 System.out.print(idClientConverted);
                 showFullDetail(idClientConverted);
                 infoPanel.setVisible(true);
-                pack();
+
             }
 
         });
@@ -105,13 +106,14 @@ public class ClientsManagement extends JDialog {
                 setVisible(false);
             }
         });
-        deleteButton.addActionListener(new ActionListener() {
+        /*deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 deleteClient();
                 jtable.revalidate();
             }
         });
+         */
         addB.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -138,7 +140,16 @@ public class ClientsManagement extends JDialog {
         });
 
 
-
+        saveB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    updateClient();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        });
     }
     private void showFullDetail(int id){
         ClientService client = new ClientService();
@@ -157,6 +168,7 @@ public class ClientsManagement extends JDialog {
     }
     private void clearInputs(){
         List<JTextField> tfList = new ArrayList<JTextField>();
+        List<JComboBox> cbList = new ArrayList<>();
 
         tfList.add(in_name);
         tfList.add(in_phone);
@@ -166,8 +178,16 @@ public class ClientsManagement extends JDialog {
         tfList.add(in_street);
         tfList.add(in_zip);
 
+        cbList.add(day_box);
+        cbList.add(mounth_box);
+        cbList.add(year_box);
+
         for(JTextField tf : tfList){
             tf.setText("");
+        }
+
+        for(JComboBox cb : cbList){
+            cb.removeAllItems();
         }
 
     }
@@ -191,13 +211,17 @@ public class ClientsManagement extends JDialog {
     private void showInfoEdit(int id){
         idClientOnEdit= id; //Guarda o ID do produto que está a ser editado para mais tarde ser usado no update
         ClientService client = new ClientService();
+        AddresService address = new AddresService();
 
         client.read(id); //lê o produto que tem o id indicado
+        address = readAdress(id);
+
         in_name.setText(client.getName());
         in_mail.setText(String.valueOf(client.getMail()));
         in_pass.setText(String.valueOf(client.getPassword()));
-        //in_street.setText(String.valueOf());
-        //in_zip.setText(String.valueOf());
+        in_house.setText(String.valueOf(address.getHousenumber()));
+        in_street.setText(String.valueOf(address.getStreetname()));
+        in_zip.setText(String.valueOf(address.getZip()));
         in_phone.setText(String.valueOf(client.getPhone()));
 
 
@@ -272,14 +296,14 @@ public class ClientsManagement extends JDialog {
         model.addColumn("Mail");
 
         for(ClientService client: clients){
-            model.addRow(new Object[]{client.getName(), client.getName(), client.getBirthdate(), client.getMail()});
+            model.addRow(new Object[]{client.getC_id(), client.getName(), client.getBirthdate(), client.getMail()});
         }
 
         this.jtable.setModel(model);
 
     }
 
-    private void deleteClient(){
+    /*private void deleteClient(){
         int dialogButton = JOptionPane.YES_NO_OPTION;
         ClientService deleteClient = new ClientService();
 
@@ -289,6 +313,8 @@ public class ClientsManagement extends JDialog {
             this.jtable.setModel(updateTableAfterAddDeleteUpdate());
         }
     }
+     */
+
     private void addClient() throws SQLException, ParseException {
         String dateSelected;
 
@@ -298,7 +324,7 @@ public class ClientsManagement extends JDialog {
         dateSelected = year_box.getSelectedItem() + "-" + mounth_box.getSelectedItem() + "-" +  day_box.getSelectedItem();
         Date date1 = Date.valueOf(dateSelected);
 
-        addClient.create(in_name.getText(), date1, in_mail.getText(), Integer.parseInt(in_phone.getText()), in_street.getText(), Integer.parseInt(in_zip.getText()), Integer.parseInt(in_house.getText()), in_pass.getText(), idClientOnEdit);
+        addClient.create(in_name.getText(), date1, in_mail.getText(), Integer.parseInt(in_phone.getText()), in_street.getText(), Integer.parseInt(in_zip.getText()), Integer.parseInt(in_house.getText()), in_pass.getText());
 
         this.jtable.setModel(updateTableAfterAddDeleteUpdate());
 
@@ -307,6 +333,27 @@ public class ClientsManagement extends JDialog {
         pack();
 
     }
+
+    private void updateClient() throws SQLException {
+        String dateSelected;
+
+        ClientService addClient = new ClientService(); //Para correr a função create() que se encontra o file ProductService
+
+
+        dateSelected = year_box.getSelectedItem() + "-" + mounth_box.getSelectedItem() + "-" +  day_box.getSelectedItem();
+        Date date1 = Date.valueOf(dateSelected);
+
+        addClient.update(in_name.getText(), date1, in_mail.getText(), Integer.parseInt(in_phone.getText()), in_pass.getText(), idClientOnEdit, in_street.getText(), Integer.parseInt(in_house.getText()), Integer.parseInt(in_zip.getText()));
+
+        this.jtable.setModel(updateTableAfterAddDeleteUpdate());
+
+        clearInputs();
+        editPanel.setVisible(false);
+        pack();
+
+    }
+
+
     private DefaultTableModel updateTableAfterAddDeleteUpdate(){
         clients = ClientService.readAll();
         DefaultTableModel model = new DefaultTableModel();
@@ -316,7 +363,7 @@ public class ClientsManagement extends JDialog {
         model.addColumn("Mail");
 
         for(ClientService client: clients){
-            model.addRow(new Object[]{client.getName(), client.getName(), client.getBirthdate(), client.getMail()});
+            model.addRow(new Object[]{client.getC_id(), client.getName(), client.getBirthdate(), client.getMail()});
         }
 
         return model;

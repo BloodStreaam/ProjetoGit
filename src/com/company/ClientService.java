@@ -99,7 +99,7 @@ public class ClientService {
 
 
     }
-    public void delete(int id){
+    /*public void delete(int id){
 
         Connection conn = SQLConnection.criarConexao();
         String sqlCommand = "DELETE CLIENT WHERE C_ID = ?";
@@ -113,9 +113,21 @@ public class ClientService {
         } catch (SQLException ex) {
             System.out.println("ERRO: " + ex.getMessage());
         }
-    }
 
-    public void create(String name, Date birthdate, String mail, int phone, String address, int zip, int housenumber, String Pass, int cID) throws SQLException {
+        String sqlCommandAddress = "DELETE ADDRESS WHERE C_ID = ?";
+        try {
+            PreparedStatement stAddress = conn.prepareStatement(sqlCommandAddress);
+            stAddress.setInt(1, id);
+
+            stAddress.execute();
+
+        } catch (SQLException ex) {
+            System.out.println("ERRO: " + ex.getMessage());
+        }
+
+    }*/
+
+    public void create(String name, Date birthdate, String mail, int phone, String address, int zip, int housenumber, String Pass) throws SQLException {
         Connection conn = SQLConnection.criarConexao();
 
         String sqlCommand = "INSERT INTO CLIENT COLUMNS (NAME, BIRTHDATE, MAIL, PHONE, PASSWORD) "
@@ -130,22 +142,64 @@ public class ClientService {
         pst.setString(5, Pass);
         pst.execute();
 
-        String sqlCommandAddress = "INSERT INTO ADDRESS COLUMNS (A_ID, STREETNAME, HOUSENUMBER, C_ID, ZIP) "
-                + "VALUES (?, ?, ?, ?, ?)";
+       String sqlCommandSelectClient ="SELECT C_ID FROM CLIENT WHERE PHONE = ? AND to_char(NAME) = ?";
+
+        PreparedStatement st = conn.prepareStatement(sqlCommandSelectClient);
+        st.setInt(1, phone);
+        st.setString(2, name);
+        ResultSet rs = st.executeQuery();
+
+        if(rs.next()) {
+            this.c_id = (rs.getInt("C_ID"));
+        }
+
+        String sqlCommandAddress = "INSERT INTO ADDRESS COLUMNS (STREETNAME, HOUSENUMBER, C_ID, ZIP) "
+                + "VALUES (?, ?, ?, ?)";
 
         PreparedStatement pstAddress = conn.prepareStatement(sqlCommandAddress);
 
-        pstAddress.setInt(1, 21);
-        pstAddress.setString(2, address);
-        pstAddress.setInt(3, housenumber);
-        pstAddress.setInt(4, cID);
-        pstAddress.setInt(5, zip);
+
+        pstAddress.setString(1, address);
+        pstAddress.setInt(2, housenumber);
+        pstAddress.setInt(3, this.c_id);
+        pstAddress.setInt(4, zip);
+
+        pstAddress.execute();
+
+
+
+
+    }
+
+    public void update(String name, Date birthdate, String mail, int phone, String pass, int c_id, String streetname, int houseNumber, int zip) throws SQLException {
+        Connection conn = SQLConnection.criarConexao();
+
+        String sqlCommand = "UPDATE CLIENT SET NAME = ?, BIRTHDATE = ?, MAIL = ?, PHONE = ?, PASSWORD = ? WHERE C_ID = ?";
+        PreparedStatement pst = conn.prepareStatement(sqlCommand);
+
+        pst.setString(1, name);
+        pst.setDate(2, birthdate);
+        pst.setString(3, mail);
+        pst.setInt(4, phone);
+        pst.setString(5, pass);
+        pst.setInt(6, c_id);
+
+        pst.execute();
+
+        String sqlCommandAddress = "UPDATE ADDRESS SET STREETNAME = ?, HOUSENUMBER = ?, ZIP = ? WHERE C_ID = ?";
+        PreparedStatement pstAddress = conn.prepareStatement(sqlCommandAddress);
+
+        pstAddress.setString(1, streetname);
+        pstAddress.setInt(2, houseNumber);
+        pstAddress.setInt(3, zip);
+        pstAddress.setInt(4, c_id);
 
         pstAddress.execute();
 
 
 
     }
+
     public static List<ClientService> search(String client) throws SQLException {
         Connection conn = SQLConnection.criarConexao();
 
@@ -154,10 +208,10 @@ public class ClientService {
 
 
         if(!client.isEmpty()){
-            sqlCommand+= "WHERE NAME LIKE ? ";
+            sqlCommand+= "WHERE to_char(NAME) LIKE ? ";
         }
 
-        sqlCommand+="ORDER BY NAME";
+        sqlCommand+="ORDER BY to_char(NAME)";
         List<ClientService> list = new ArrayList<>();
 
         try {
