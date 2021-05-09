@@ -72,12 +72,12 @@
               <text value="Log Out"/>
             </properties>
           </component>
-          <component id="dd090" class="javax.swing.JButton" binding="userViewButton" default-binding="true">
+          <component id="dd090" class="javax.swing.JButton" binding="requestRestockButton">
             <constraints>
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="User View"/>
+              <text value="Request Restock"/>
             </properties>
           </component>
           <component id="97c3f" class="javax.swing.JButton" binding="globalViewButton" default-binding="true">

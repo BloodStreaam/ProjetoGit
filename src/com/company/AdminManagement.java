@@ -11,7 +11,7 @@ public class AdminManagement extends JDialog {
     private JButton producersButton;
     private JButton clientsButton;
     private JButton restockButton;
-    private JButton userViewButton;
+    private JButton requestRestockButton;
     private JButton logOutButton;
     private JButton globalViewButton;
     private JButton buttonOK;
@@ -21,7 +21,9 @@ public class AdminManagement extends JDialog {
     public static EmployeesManagement jEmployeesManagement;
     public static ClientsManagement jClientsManagement;
     public static RestockManagement jRestockManagement;
-
+    public static ProducerManagement jProducerManagement;
+    public static OrderManagement jOrderManagement;
+    public static ReqRestockManagement jReqRestockManagement;
     public AdminManagement() {
         setContentPane(contentPane);
         setModal(true);
@@ -57,6 +59,30 @@ public class AdminManagement extends JDialog {
                 jRestockManagement = new RestockManagement();
                 jRestockManagement.pack();
                 jRestockManagement.setVisible(true);
+            }
+        });
+        producersButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jProducerManagement =new ProducerManagement();
+                jProducerManagement.pack();
+                jProducerManagement.setVisible(true);
+            }
+        });
+        ordersButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jOrderManagement = new OrderManagement();
+                jOrderManagement.pack();
+                jOrderManagement.setVisible(true);
+            }
+        });
+        requestRestockButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jReqRestockManagement = new ReqRestockManagement();
+                jReqRestockManagement.pack();
+                jReqRestockManagement.setVisible(true);
             }
         });
     }

@@ -104,6 +104,7 @@ public class EmployeesManagement extends JDialog {
         jtable.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                pack();
                 idEmployeeSelected = jtable.getValueAt(jtable.getSelectedRow(),0).toString();
                 idEmployeeConverted = Integer.parseInt(idEmployeeSelected);
                 System.out.println(idEmployeeConverted);
@@ -157,6 +158,20 @@ public class EmployeesManagement extends JDialog {
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
+            }
+        });
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+            }
+        });
+        xButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clearInputs();
+                editPanel.setVisible(false);
+                pack();
             }
         });
     }

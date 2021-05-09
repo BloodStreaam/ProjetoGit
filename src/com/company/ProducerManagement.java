@@ -26,7 +26,6 @@ public class ProducerManagement extends JDialog {
     private JComboBox farmInput;
     private JButton saveButton;
     private JButton addB;
-    private JTextField text2;
     private JScrollPane scroll1;
     private JLabel nomeInfo;
     private JLabel emailInfo;
@@ -34,23 +33,32 @@ public class ProducerManagement extends JDialog {
     private JPanel infoPanel;
     private JPanel editPanel;
     private JScrollPane jscrollRequests;
+    private JButton viewProducersButton;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JScrollPane scrollPane1;
     private JTable jtable;
+    private JTable jtableRequests;
     private static List<ProducerService> producers;
+    private static List<ProducerReqService> producerRequests;
+    private static List<FarmService> farms;
     public static ProducerManagement JProducer;
     public static String idProducer;
     public static String idProducerSelected;
     private static int idProducerConverted;
     private static int idProducerOnEdit;
-    private static List<FarmService> farms;
+    public static String idProducerReqSelected;
+    private static int idProducerReqConverted;
 
     public ProducerManagement() {
         setContentPane(contentPane);
         setModal(true);
 
+        jscrollRequests.getViewport().add(jtableRequests=createJTableRequests());
         scroll1.getViewport().add(jtable=createJTable());
+
+        viewProducersButton.setVisible(false);
+        jscrollRequests.setVisible(false);
         infoPanel.setVisible(false);
         editPanel.setVisible(false);
 
@@ -100,6 +108,22 @@ public class ProducerManagement extends JDialog {
             }
 
         });
+
+        jtableRequests.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                idProducerReqSelected = jtableRequests.getValueAt(jtableRequests.getSelectedRow(),0).toString();
+                idProducerReqConverted = Integer.parseInt(idProducerReqSelected);
+                try {
+                    addDeleteProducerReq();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+                pack();
+            }
+
+        });
+
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) { deleteProducer();
@@ -143,7 +167,36 @@ public class ProducerManagement extends JDialog {
         });
 
 
+        viewRequestButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jscrollRequests.setVisible(true);
+                jtableRequests.setVisible(true);
+                scroll1.setVisible(false);
+                viewRequestButton.setVisible(false);
+                viewProducersButton.setVisible(true);
+                ADD.setVisible(false);
+                editButton.setVisible(false);
+                deleteButton.setVisible(false);
+                pack();
 
+            }
+        });
+        viewProducersButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jscrollRequests.setVisible(false);
+                jtableRequests.setVisible(false);
+                scroll1.setVisible(true);
+                jtable.setVisible(true);
+                viewProducersButton.setVisible(false);
+                viewRequestButton.setVisible(true);
+                ADD.setVisible(true);
+                editButton.setVisible(true);
+                deleteButton.setVisible(true);
+                pack();
+            }
+        });
     }
 
 
@@ -158,6 +211,24 @@ public class ProducerManagement extends JDialog {
             this.jtable.setModel(updateTableAfterAddDeleteUpdate());
 
 
+        }
+    }
+    private void addDeleteProducerReq() throws SQLException {
+        int dialogButton = JOptionPane.YES_NO_OPTION;
+        ProducerReqService ReqAddDelete = new ProducerReqService();
+        ProducerService producer = new ProducerService();
+
+        int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like Add this Producer?","Confirmation Window",dialogButton);
+        if(dialogResult == JOptionPane.YES_OPTION){
+            ReqAddDelete.read(idProducerReqConverted);
+            producer.create(ReqAddDelete.getName(),ReqAddDelete.getMail(), ReqAddDelete.getPhone());
+            ReqAddDelete.delete(idProducerReqConverted);
+            this.jtableRequests.setModel(updateTableAfterAddDeleteUpdateRequests());
+            this.jtable.setModel(updateTableAfterAddDeleteUpdate());
+        if(dialogResult == JOptionPane.NO_OPTION){
+            ReqAddDelete.delete(idProducerReqConverted);
+            this.jtableRequests.setModel(updateTableAfterAddDeleteUpdateRequests());
+        }
         }
     }
 
@@ -228,6 +299,7 @@ public class ProducerManagement extends JDialog {
         model.addColumn("Mail");
         model.addColumn("Phone");
 
+
         for(ProducerService pro : producers) {
             model.addRow(new Object[] { pro.getPROD_ID(), pro.getName(), pro.getMail() , pro.getPhone()});
         }
@@ -238,6 +310,27 @@ public class ProducerManagement extends JDialog {
 
         return jtable;
     }
+
+    private static JTable createJTableRequests(){
+        producerRequests = ProducerReqService.readAll();
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Name");
+        model.addColumn("Mail");
+        model.addColumn("Phone");
+        model.addColumn("Employee ID");
+
+        for(ProducerReqService pro : producerRequests) {
+            model.addRow(new Object[] { pro.getID_REQ(), pro.getName(), pro.getMail() , pro.getPhone(), pro.getID_E()});
+        }
+
+        JTable jtable = new JTable(model);
+        jtable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+
+        return jtable;
+    }
+
     private void addProducer() throws SQLException, ParseException {
 
         ProducerService addPro = new ProducerService();
@@ -263,6 +356,24 @@ public class ProducerManagement extends JDialog {
 
         for (ProducerService producer : producers) {
             model.addRow(new Object[]{producer.getPROD_ID(), producer.getName(), producer.getMail(), producer.getPhone()});
+        }
+
+
+        return model;
+    }
+
+    private DefaultTableModel updateTableAfterAddDeleteUpdateRequests(){
+        producerRequests = ProducerReqService.readAll();
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Name");
+        model.addColumn("Mail");
+        model.addColumn("Phone");
+        model.addColumn("Employee ID");
+
+
+        for (ProducerReqService prodRequest : producerRequests) {
+            model.addRow(new Object[]{prodRequest.getID_REQ(), prodRequest.getName(), prodRequest.getMail(), prodRequest.getPhone(), prodRequest.getID_E()});
         }
 
 

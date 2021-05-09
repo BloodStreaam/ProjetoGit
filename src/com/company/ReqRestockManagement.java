@@ -151,6 +151,12 @@ public class ReqRestockManagement extends JDialog {
             }
         });
 
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+            }
+        });
     }
 
     private void addQuantityProductToRequest(){

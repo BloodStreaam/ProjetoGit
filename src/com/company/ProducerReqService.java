@@ -56,7 +56,7 @@ public class ProducerReqService {
 
     public static List<ProducerReqService> readAll(){
         Connection conn = SQLConnection.criarConexao();
-        String sqlCommand = "SELECT * FROM REQ_PRODUCER";
+        String sqlCommand = "SELECT * FROM REQ_PRODUCER ORDER BY ID_REQ";
         List<ProducerReqService> list = new ArrayList<>();
 
         try {
@@ -67,10 +67,11 @@ public class ProducerReqService {
                 ProducerReqService producer = new ProducerReqService();
 
                 producer.setID_REQ(rs.getInt("ID_REQ"));
-                if (rs.getString("NAME") != null) producer.setName(rs.getString("NAME"));
-                if (rs.getString("MAIL") != null) producer.setMail(rs.getString("MAIL"));
-                producer.setPhone(rs.getInt("PHONE"));
+                if (rs.getString("NOME") != null) producer.setName(rs.getString("NOME"));
+                if (rs.getString("EMAIL") != null) producer.setMail(rs.getString("EMAIL"));
                 producer.setID_E(rs.getInt("ID_E"));
+                producer.setPhone(rs.getInt("PHONE"));
+
                 list.add(producer);
             }
 
@@ -82,19 +83,19 @@ public class ProducerReqService {
     }
     public void read(int id){
         Connection conn = SQLConnection.criarConexao();
-        String sqlCommand="SELECT * FROM REQ_PRODUCER WHERE = ID_REQ?";
+        String sqlCommand="SELECT * FROM REQ_PRODUCER WHERE ID_REQ = ?";
         try{
             PreparedStatement st = conn.prepareStatement(sqlCommand);
             st.setInt(1, id);
             ResultSet rs = st.executeQuery();
             if(rs.next()){
                 this.ID_REQ=(rs.getInt("ID_REQ"));
-                if(rs.getString("NAME") != null) this.name= (rs.getString("NAME"));
-                if (rs.getString("MAIL") != null) this.mail=(rs.getString("MAIL"));
+                if(rs.getString("NOME") != null) this.name= (rs.getString("NOME"));
+                if (rs.getString("EMAIL") != null) this.mail=(rs.getString("EMAIL"));
                 if (rs.getString("PHONE") != null) this.phone=(rs.getInt("PHONE"));
             }else{
 
-                System.out.println("Erro: Não existe Producer com o id Definido");
+                System.out.println("Erro: Não existe Requisito com o id Definido");
             }
 
 
@@ -106,6 +107,23 @@ public class ProducerReqService {
 
 
     }
+    public void delete(int id){
+
+        Connection conn = SQLConnection.criarConexao();
+
+        String sqlCommand = "DELETE REQ_PRODUCER WHERE ID_REQ = ?";
+
+        try {
+            PreparedStatement st = conn.prepareStatement(sqlCommand);
+            st.setInt(1, id);
+
+            st.execute();
+
+        } catch (SQLException ex) {
+            System.out.println("ERRO: " + ex.getMessage());
+        }
+    }
+
 
 
 }
