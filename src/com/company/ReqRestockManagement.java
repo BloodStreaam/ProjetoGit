@@ -18,7 +18,18 @@ import java.util.List;
         this.price = price;
     }
 
-}
+     public String getProductName() {
+         return productName;
+     }
+
+     public int getQuantity() {
+         return quantity;
+     }
+
+     public float getPrice() {
+         return price;
+     }
+ }
 
 public class ReqRestockManagement extends JDialog {
     private JPanel contentPane;
@@ -42,6 +53,8 @@ public class ReqRestockManagement extends JDialog {
     private JLabel tpriceInfo;
     private JPanel infoPanel;
     private JPanel editPanel;
+    private JScrollPane scrollpanel2;
+    private JList list1;
     private JPanel panelInfo;
     private static JTable jtable;
     private static JTable jtableProducts;
@@ -54,7 +67,7 @@ public class ReqRestockManagement extends JDialog {
     private static String idReqRestockSelected;
     private static int idReqRestockConverted;
     private static int idReqRestockOnEdit;
-    private static AddedProduct[] productsAddedToRequest = new AddedProduct[30];
+    private static AddedProduct[] productsAddedToRequest;
     private static int productCount = 0;
 
 
@@ -83,71 +96,61 @@ public class ReqRestockManagement extends JDialog {
             }
 
         });
+        if(jtableProductsAdded != null) {
+            jtableProductsAdded.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    String name;
+                    name = jtableProductsAdded.getValueAt(jtableProductsAdded.getSelectedRow(), 0).toString();
+                    System.out.println(name+ "Merda para ti");
+                    for (int i = 0; i <= productCount; i++) {
+                        if (productsAddedToRequest[i].getProductName().equals(name)) {
+                            int dialogButton = JOptionPane.YES_NO_OPTION;
 
+                            int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like to Delete this Product?","Warning",dialogButton);
+                            if(dialogResult == JOptionPane.YES_OPTION){
+                                productsAddedToRequest[i] = null;
+                            }
+
+                        }
+                    }
+
+                    pack();
+
+                }
+
+            });
+        }
         editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                showInfoEdit(idReqRestockConverted);
+                productCount = showInfoEdit(idReqRestockConverted);
                 saveButton.setVisible(true);
                 addButton1.setVisible(false);
                 editPanel.setVisible(true);
                 pack();
             }
         });
-        farmBox.addActionListener(new ActionListener() {
+        farmBox.addItemListener(new ItemListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                changeProducts();
-            }
-        });
-        productBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-    }
-
-    private static JTable createJTableReqRestock() {
-        reqs_restock = ReqRestockService.readAll();
-        restockDetails = RestockDetailsService.readAll();
-        int precoTotal = 0;
-        int nProdutos = 0;
-        DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("ID");
-        model.addColumn("Nº Products");
-        model.addColumn("Price");
-        model.addColumn("Date");
-
-
-
-        for (ReqRestockService reqRestock : reqs_restock) {
-            precoTotal = 0;
-            nProdutos = 0;
-            for(RestockDetailsService restockDetail: restockDetails){
-                System.out.println(restockDetail.getR_id());
-                if(restockDetail.getReq_id() == reqRestock.getReq_id()){
-                    precoTotal +=  restockDetail.getPrice();
-                    nProdutos++;
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    changeProducts();
                 }
 
             }
-            model.addRow(new Object[]{reqRestock.getReq_id(), nProdutos , precoTotal, reqRestock.getReq_date()});
+        });
+        productBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
 
-        }
+                    //addQuantityProductToRequest();
+                }
 
+            }
+        });
 
-        // for(EmployeeService emp : employees)
-
-            /*values.add(new String[] { String.valueOf(emp.getE_id()),  emp.getName(),  String.valueOf(emp.getBirthdate()),
-                    emp.getMail(),  String.valueOf(emp.getPhone()),  String.valueOf(emp.getSalary()), emp.getAddress(), emp.getZip() });
-*/
-        JTable jtable = new JTable(model);
-        jtable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-
-
-        return jtable;
     }
 
     private void addQuantityProductToRequest(){
@@ -166,6 +169,7 @@ public class ReqRestockManagement extends JDialog {
         int quantityInt = Integer.parseInt(quantity);
 
         if(quantityInt >= 0){
+
             productsAddedToRequest[productCount].setData(prod.getName(), quantityInt, prod.getPrice_un());
             productCount++;
         }
@@ -182,10 +186,8 @@ public class ReqRestockManagement extends JDialog {
 
 
         reqRestock.read(idReqRestock);
-        System.out.println(reqRestock.getE_id());
-        System.out.println("xau");
         employee.read(reqRestock.getE_id());
-        System.out.println("oi");
+
         restockDetails = RestockDetailsService.readReq(reqRestock.getReq_id());
 
 
@@ -219,10 +221,13 @@ public class ReqRestockManagement extends JDialog {
 
     }
 
-    private void showInfoEdit(int id){
+    private int showInfoEdit(int id){
         idReqRestockOnEdit= id; //Guarda o ID do produto que está a ser editado para mais tarde ser usado no update
         EmployeeService employee = new EmployeeService();
         ReqRestockService reqRestock = new ReqRestockService();
+        ProductService prod = new ProductService();
+        productsAddedToRequest = new AddedProduct[20];
+        int count = 0;
 
 
         farms = FarmService.readAllFarms();
@@ -233,15 +238,46 @@ public class ReqRestockManagement extends JDialog {
         employeeField.setText(employee.getName());
         dateField.setText(String.valueOf(reqRestock.getReq_date()));
 
+        productBox.removeAllItems();
         for(FarmService farm: farms){
             farmBox.addItem(farm.getName());
-            for(ProductService product: products){
-                if(farm.getIdFarm() == product.getFarm_id()){
-                    productBox.addItem(product.getName());
+            if(farm.getName().equals(farmBox.getSelectedItem())){
+                for(ProductService product: products){
+                    if(farm.getIdFarm() == product.getFarm_id()){
+                        productBox.addItem(product.getName());
+                    }
                 }
             }
         }
 
+        restockDetails = RestockDetailsService.readReq(reqRestock.getReq_id());
+
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("Name");
+        model.addColumn("Quantity");
+        model.addColumn("Price");
+
+        for(RestockDetailsService detail : restockDetails){
+            prod.read(detail.getP_id());
+            productsAddedToRequest[count] = new AddedProduct();
+            productsAddedToRequest[count].setData(prod.getName(), detail.getQuantity(), prod.getPrice_un());
+            count++;
+        }
+
+        System.out.println(productsAddedToRequest[count-1].getProductName());
+        for(int i = 0; i<=count-1; i++){
+            model.addRow(new Object[]{productsAddedToRequest[i].getProductName(), productsAddedToRequest[i].getQuantity() , productsAddedToRequest[i].getPrice()});
+        }
+
+        JTable jtable = new JTable(model);
+
+
+
+        scrollpanel2.getViewport().add(jtableProductsAdded=jtable);
+        scrollpanel2.setPreferredSize(new Dimension(250,100));
+        scrollpanel2.revalidate();
+
+        return count-1;
 
     }
 
@@ -264,6 +300,39 @@ public class ReqRestockManagement extends JDialog {
         }
 
     }
+
+
+    private static JTable createJTableReqRestock() {
+        reqs_restock = ReqRestockService.readAll();
+        restockDetails = RestockDetailsService.readAll();
+        int precoTotal = 0;
+        int nProdutos = 0;
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Nº Products");
+        model.addColumn("Price");
+        model.addColumn("Date");
+
+        for (ReqRestockService reqRestock : reqs_restock) {
+            precoTotal = 0;
+            nProdutos = 0;
+            for(RestockDetailsService restockDetail: restockDetails){
+                System.out.println(restockDetail.getR_id());
+                if(restockDetail.getReq_id() == reqRestock.getReq_id()){
+                    precoTotal +=  restockDetail.getPrice();
+                    nProdutos++;
+                }
+
+            }
+            model.addRow(new Object[]{reqRestock.getReq_id(), nProdutos , precoTotal, reqRestock.getReq_date()});
+
+        }
+        JTable jtable = new JTable(model);
+        jtable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        return jtable;
+    }
+
 
     public static void main(String[] args) {
         ReqRestockManagement dialog = new ReqRestockManagement();

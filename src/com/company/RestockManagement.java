@@ -2,7 +2,9 @@ package com.company;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RestockManagement extends JDialog {
@@ -15,8 +17,6 @@ public class RestockManagement extends JDialog {
     private JTextField employeeField;
     private JComboBox farmBox;
     private JComboBox prodBox;
-    private JTable table1;
-    private JButton makeRequestButton;
     private JButton addButton;
     private JButton saveButton;
     private JLabel idInfo;
@@ -26,7 +26,6 @@ public class RestockManagement extends JDialog {
     private JLabel paymentInfo;
     private JLabel transportationInfo;
     private JScrollPane productsTableInfo;
-    private JPanel tableProductsInput;
     private static JTable jtableRestock;
     private static JTable jtable2;
     private static JTable jtableReqRestock;
@@ -34,14 +33,19 @@ public class RestockManagement extends JDialog {
     private JPanel editPanel;
     private JPanel infoPanel;
     private JLabel tpriceInfo;
+    private JTable jtableAddedProducts;
+    private JScrollPane jscrollpane2;
     private JButton showRestocksButton;
+    private static List<ProductService> products;
+    private static List<FarmService> farms;
     private static List<RestockDetailsService> restockDetails;
     private static List<RestockService> restocks;
     private static List<ReqRestockService> reqs_restock;
     private static String idRestockSelected;
     private static int idRestockConverted;
-    private static String idReqRestockSelected;
-    private static int idReqRestockConverted;
+    private static String addedProductName;
+    private static Object[] addedProducts  = new Object[20];;
+
 
     public RestockManagement() {
         setContentPane(contentPane);
@@ -49,8 +53,6 @@ public class RestockManagement extends JDialog {
 
 
         scrollpanel.getViewport().add(jtableRestock=createJTableRestock());
-        jtableReqRestock.setVisible(false);
-        showRestocksButton.setVisible(false);
         editPanel.setVisible(false);
         infoPanel.setVisible(false);
 
@@ -68,20 +70,18 @@ public class RestockManagement extends JDialog {
 
         });
 
+        jtableAddedProducts.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                addedProductName = jtableAddedProducts.getValueAt(jtableAddedProducts.getSelectedRow(),0).toString();
 
-        jtableReqRestock.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    idReqRestockSelected = jtableReqRestock.getValueAt(jtableReqRestock.getSelectedRow(), 0).toString();
-                    idReqRestockConverted = Integer.parseInt(idReqRestockSelected);
-                    System.out.println(idReqRestockConverted);
-                    infoPanel.setVisible(true);
-                    showFullDetail(idReqRestockConverted);
-                    pack();
+                pack();
 
-                }
+            }
 
         });
+
+
 
 
         showRequestButton.addActionListener(new ActionListener() {
@@ -97,14 +97,27 @@ public class RestockManagement extends JDialog {
             }
         });
 
-        showRestocksButton.addActionListener(new ActionListener() {
+        addButton1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                jtableReqRestock.setVisible(false);
-                idRestockConverted = 0;
-                showRequestButton.setVisible(true);
-                showRestocksButton.setVisible(false);
-                jtableRestock.setVisible(true);
+                clearInputs();
+                fillAddArea();
+                editPanel.setVisible(true);
+                pack();
+            }
+        });
+        farmBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                updateComboBoxProducts();
+                pack();
+
+            }
+        });
+        prodBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
             }
         });
     }
@@ -153,6 +166,126 @@ public class RestockManagement extends JDialog {
 
 
     }
+
+    private void fillAddArea(){
+       farms = FarmService.readAllFarms();
+       products = ProductService.readAll();
+       EmployeeService employee = new EmployeeService();
+
+       employee.read(1); //Mudar o ID para GetLoggedemployeeId
+       employeeField.setText(employee.getName());
+       dateField.setText(String.valueOf(java.time.LocalDate.now()));
+
+       farmBox.addItem("");
+       prodBox.addItem("");
+       prodBox.setSelectedItem("");
+       farmBox.setSelectedItem("");
+        for (FarmService farm : farms) {
+            farmBox.addItem(farm.getName());
+
+            if(farm.getName().equals(farmBox.getSelectedItem())){
+                farmBox.setSelectedItem(farm.getName());
+                for (ProductService product: products){
+                    if(farm.getIdFarm() == product.getFarm_id()){
+                        prodBox.addItem(product.getName());
+                    }
+                }
+            }
+        }
+
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Nº Products");
+        model.addColumn("Price");
+        model.addColumn("Date");
+
+
+        JTable jtable = new JTable(model);
+        jtable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        jscrollpane2.getViewport().add(jtableAddedProducts = jtable);
+        jscrollpane2.setPreferredSize(new Dimension(250,100));
+        jscrollpane2.revalidate();
+
+    }
+
+    private void clearInputs(){
+        List<JTextField> tfList = new ArrayList<JTextField>();
+        List<JComboBox> cbList = new ArrayList<JComboBox>();
+
+
+        tfList.add(employeeField);
+        tfList.add(dateField);
+
+
+        cbList.add(farmBox);
+        cbList.add(prodBox);
+
+
+        for(JTextField tf : tfList){
+            tf.setText("");
+        }
+
+        for(JComboBox cb : cbList){
+            cb.removeAllItems();
+        }
+
+
+    }
+
+    private void updateComboBoxProducts(){
+
+        farms = FarmService.readAllFarms();
+        products = ProductService.readAll();
+
+        prodBox.removeAllItems();
+        prodBox.addItem("");
+        prodBox.setSelectedItem("");
+
+        for(FarmService farm: farms){
+            if(farm.getName().equals(farmBox.getSelectedItem())){
+                for(ProductService product: products){
+                    if(product.getFarm_id() == farm.getIdFarm()){
+                        prodBox.addItem(product.getName());
+                    }
+                }
+            }
+        }
+
+    }
+
+    private void selectProductToAdd(){
+        int dialogButton = JOptionPane.YES_NO_OPTION;
+
+        int dialogResult = JOptionPane.showConfirmDialog (null, "How many items do you want to do restock?","Warning",dialogButton);
+        if(dialogResult == JOptionPane.YES_OPTION){
+            if(dialogResult >=0){
+
+            }
+        }
+
+
+
+    }
+
+    private void updateAddedProductTable(int quantity){
+        products = ProductService.readAll();
+
+
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("Name");
+        model.addColumn("Quantity");
+        model.addColumn("Price");
+
+
+        this.jtableAddedProducts.setModel(model);
+        this.jscrollpane2.revalidate();
+
+
+    }
+
+
+
 
     //Cria a tabela de produtos com as informações mais importantes
     private static JTable createJTableRestock() {
