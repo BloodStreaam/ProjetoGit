@@ -146,6 +146,51 @@ public class ClientService {
 
 
     }
+    public static List<ClientService> search(String client) throws SQLException {
+        Connection conn = SQLConnection.criarConexao();
+
+        String sqlCommand = "SELECT * FROM CLIENT ";
+
+
+
+        if(!client.isEmpty()){
+            sqlCommand+= "WHERE NAME LIKE ? ";
+        }
+
+        sqlCommand+="ORDER BY NAME";
+        List<ClientService> list = new ArrayList<>();
+
+        try {
+
+            PreparedStatement st = conn.prepareStatement(sqlCommand);
+
+
+            if(client.isEmpty() == false ){
+
+                st.setString(1, "%" + client + "%");
+
+            }
+
+            ResultSet rs = st.executeQuery();
+
+            while(rs.next()){
+
+                ClientService cli = new ClientService();
+
+                cli.setC_id(rs.getInt("C_ID"));
+                cli.setName(rs.getString("NAME"));
+                cli.setMail(rs.getString("MAIL"));
+                cli.setBirthdate(rs.getDate("BIRTHDATE"));
+
+                list.add(cli);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERRO: " + ex.getMessage());
+        }
+
+        return list;
+    }
 
 
 }
