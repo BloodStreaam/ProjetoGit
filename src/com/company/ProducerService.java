@@ -39,7 +39,7 @@ public class ProducerService {
 
     public static List<ProducerService> readAll(){
         Connection conn = SQLConnection.criarConexao();
-        String sqlCommand = "SELECT * FROM PRODUCER";
+        String sqlCommand = "SELECT * FROM PRODUCER ORDER BY PROD_ID";
         List<ProducerService> list = new ArrayList<>();
 
         try {
@@ -137,10 +137,10 @@ public class ProducerService {
         String sqlCommand = "SELECT * FROM PRODUCER ";
 
         if(!name.isEmpty() ){
-            sqlCommand+= "WHERE NAME LIKE ? ";
+            sqlCommand+= "WHERE to_char(NAME) LIKE ? ";
         }
 
-        sqlCommand+="ORDER BY NAME";
+        sqlCommand+="ORDER BY to_char(NAME)";
         List<ProducerService> list = new ArrayList<>();
 
         try {
@@ -156,8 +156,8 @@ public class ProducerService {
                 ProducerService prod = new ProducerService();
 
                 prod.setPROD_ID(rs.getInt("PROD_ID"));
-                prod.setName(rs.getString("NAME: "));
-                prod.setMail(rs.getString("MAIL:"));
+                prod.setName(rs.getString("NAME"));
+                prod.setMail(rs.getString("MAIL"));
                 prod.setPhone(rs.getInt("PHONE"));
                 list.add(prod);
             }

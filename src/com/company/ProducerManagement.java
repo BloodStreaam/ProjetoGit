@@ -33,7 +33,7 @@ public class ProducerManagement extends JDialog {
     private JLabel phoneInfo;
     private JPanel infoPanel;
     private JPanel editPanel;
-    private JLabel farmInfo;
+    private JScrollPane jscrollRequests;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JScrollPane scrollPane1;
@@ -94,7 +94,6 @@ public class ProducerManagement extends JDialog {
             public void mousePressed(MouseEvent e) {
                 idProducerSelected = jtable.getValueAt(jtable.getSelectedRow(),0).toString();
                 idProducerConverted = Integer.parseInt(idProducerSelected);
-                System.out.print(idProducer);
                 showFullDetail(idProducerConverted);
                 infoPanel.setVisible(true);
                 pack();
@@ -103,7 +102,8 @@ public class ProducerManagement extends JDialog {
         });
         deleteButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) { deleteProducer(); }
+            public void actionPerformed(ActionEvent e) { deleteProducer();
+            jtable.revalidate();}
         });
 
         addB.addActionListener(new ActionListener() {
@@ -111,6 +111,7 @@ public class ProducerManagement extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     addProducer();
+                    jtable.revalidate();
                 } catch (SQLException | ParseException throwables) {
                     throwables.printStackTrace();
                 }
@@ -121,6 +122,7 @@ public class ProducerManagement extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     updateEmployee();
+                    jtable.revalidate();
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
@@ -143,6 +145,9 @@ public class ProducerManagement extends JDialog {
 
 
     }
+
+
+
     private void deleteProducer(){
         int dialogButton = JOptionPane.YES_NO_OPTION;
         ProducerService delete = new ProducerService();
@@ -150,8 +155,8 @@ public class ProducerManagement extends JDialog {
         int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like to Delete this Producer?","Warning",dialogButton);
         if(dialogResult == JOptionPane.YES_OPTION){
             delete.delete(idProducerConverted);
-            scroll1.getViewport().remove(jtable);
-            scroll1.getViewport().add(jtable=createJTable());
+            this.jtable.setModel(updateTableAfterAddDeleteUpdate());
+
 
         }
     }
@@ -181,11 +186,6 @@ public class ProducerManagement extends JDialog {
         nomeInfo.setText("Name: " + producer.getName());
         emailInfo.setText("Email: "+ producer.getMail());
         phoneInfo.setText("Phone: "+ producer.getPhone());
-        for(FarmService farm: farms){
-            if(farm.getIdProducer() == id){
-                farmInfo.setText("Farm "+ farm.getName());
-            }
-        }
 
 
 
@@ -195,6 +195,7 @@ public class ProducerManagement extends JDialog {
         idProducerOnEdit= id; //Guarda o ID do produto que está a ser editado para mais tarde ser usado no update
         ProducerService producer = new ProducerService();
 
+
         producer.read(id); //lê o produto que tem o id indicado
         System.out.println(producer.getName());
         name_in.setText(producer.getName());
@@ -202,18 +203,12 @@ public class ProducerManagement extends JDialog {
         phone_in.setText(String.valueOf(producer.getPhone()));
 
 
-        //Adiciona as quintas a combobox,
-        for(FarmService farm: farms){
-            farmInput.addItem(farm.getName());
-            if(farm.getIdProducer() == id){
-                farmInput.setSelectedItem(farm.getName());
-            }
-        }
 
 
     }
     private void clearInputs(){
         List<JTextField> tfList = new ArrayList<JTextField>();
+
 
         tfList.add(name_in);
         tfList.add(email_in);
@@ -222,6 +217,7 @@ public class ProducerManagement extends JDialog {
         for(JTextField tf : tfList){
             tf.setText("");
         }
+
 
     }
     private static JTable createJTable(){
@@ -248,8 +244,7 @@ public class ProducerManagement extends JDialog {
 
         addPro.create(name_in.getText(), email_in.getText(), Integer.parseInt(phone_in.getText()));
 
-        scroll1.getViewport().remove(jtable);
-        scroll1.getViewport().add(jtable=createJTable());
+        this.jtable.setModel(updateTableAfterAddDeleteUpdate());
 
         clearInputs();
         editPanel.setVisible(false);
@@ -257,13 +252,30 @@ public class ProducerManagement extends JDialog {
 
     }
 
+    private DefaultTableModel updateTableAfterAddDeleteUpdate(){
+        producers = ProducerService.readAll();
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Name");
+        model.addColumn("Mail");
+        model.addColumn("Phone");
+
+
+        for (ProducerService producer : producers) {
+            model.addRow(new Object[]{producer.getPROD_ID(), producer.getName(), producer.getMail(), producer.getPhone()});
+        }
+
+
+        return model;
+    }
+
     private void updateEmployee() throws SQLException {
         ProducerService upPro = new ProducerService();
 
         //Atualiza o produto com o id definido na tabela produtos
         upPro.update(name_in.getText(), email_in.getText(), Integer.parseInt(phone_in.getText()), idProducerOnEdit);
-        scroll1.getViewport().remove(jtable);
-        scroll1.getViewport().add(jtable=createJTable());
+
+        this.jtable.setModel(updateTableAfterAddDeleteUpdate());
         clearInputs();
         editPanel.setVisible(false);
         pack();
