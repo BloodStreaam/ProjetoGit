@@ -2,6 +2,7 @@ package com.company;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class ReqRestockManagement extends JDialog {
     private JPanel panelInfo;
     private static JTable jtable;
     private static JTable jtableProducts;
+    private static JTable jtableProductsAdded;
     private static List<RestockDetailsService> restockDetails;
     private static List<RestockService> restocks;
     private static List<ReqRestockService> reqs_restock;
@@ -38,6 +40,7 @@ public class ReqRestockManagement extends JDialog {
     private static String idReqRestockSelected;
     private static int idReqRestockConverted;
     private static int idReqRestockOnEdit;
+    private static Object[] productsAddedToRequest;
 
 
     public ReqRestockManagement() {
@@ -47,6 +50,8 @@ public class ReqRestockManagement extends JDialog {
         editPanel.setVisible(false);
         infoPanel.setVisible(false);
         scrollpanel1.getViewport().add( jtable=createJTableReqRestock());
+        scrollpanel1.setPreferredSize(new Dimension(500,150));
+        scrollpanel1.revalidate();
 
         jtable.addMouseListener(new MouseAdapter() {
             @Override
@@ -77,6 +82,12 @@ public class ReqRestockManagement extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 changeProducts();
+            }
+        });
+        productBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
             }
         });
     }
@@ -123,6 +134,22 @@ public class ReqRestockManagement extends JDialog {
         return jtable;
     }
 
+    private void addQuantityProductToRequest(){
+        products = ProductService.readAll();
+        ProductService prod = new ProductService();
+
+
+        for(ProductService product: products){
+            if(product.getName().equals(productBox.getSelectedItem())){
+                prod.read(product.getProduct_id());
+            }
+        }
+
+        String quantity = JOptionPane.showInputDialog("Quantity");
+        int quantityInt = Integer.parseInt(quantity);
+
+    }
+
     private void showFullDetail(int idReqRestock){
         ReqRestockService reqRestock = new ReqRestockService();
         EmployeeService employee = new EmployeeService();
@@ -157,7 +184,8 @@ public class ReqRestockManagement extends JDialog {
 
 
         scrollpanel.getViewport().add(jtableProducts=jtable);
-
+        scrollpanel.setPreferredSize(new Dimension(250,100));
+        scrollpanel.revalidate();
 
 
         idInfo.setText("ID: " + reqRestock.getReq_id());
