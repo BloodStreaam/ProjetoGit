@@ -17,8 +17,8 @@ public class ClientsManagement extends JDialog {
     public static boolean jEditCheck = false;
     private JButton deleteButton;
     private JButton backButton;
-    private JTextField textField1;
-    private JButton sButton;
+    private JTextField in_search;
+    private JButton searchB;
     private JTextField in_name;
     private JTextField in_mail;
     private JTextField in_phone;
@@ -123,6 +123,19 @@ public class ClientsManagement extends JDialog {
                 }
             }
         });
+        searchB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    searchClients();
+                    jtable.revalidate();
+
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+
+                }
+            }
+        });
 
 
 
@@ -148,6 +161,10 @@ public class ClientsManagement extends JDialog {
         tfList.add(in_name);
         tfList.add(in_phone);
         tfList.add(in_mail);
+        tfList.add(in_house);
+        tfList.add(in_pass);
+        tfList.add(in_street);
+        tfList.add(in_zip);
 
         for(JTextField tf : tfList){
             tf.setText("");
@@ -178,6 +195,11 @@ public class ClientsManagement extends JDialog {
         client.read(id); //lê o produto que tem o id indicado
         in_name.setText(client.getName());
         in_mail.setText(String.valueOf(client.getMail()));
+        in_pass.setText(String.valueOf(client.getPassword()));
+        //in_street.setText(String.valueOf());
+        //in_zip.setText(String.valueOf());
+        in_phone.setText(String.valueOf(client.getPhone()));
+
 
 
         String date= String.valueOf(client.getBirthdate());
@@ -238,7 +260,24 @@ public class ClientsManagement extends JDialog {
         }
         return null;
     }
+    private void searchClients() throws SQLException {
 
+
+        clients = ClientService.search(in_search.getText());
+
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Name");
+        model.addColumn("Bithdate");
+        model.addColumn("Mail");
+
+        for(ClientService client: clients){
+            model.addRow(new Object[]{client.getName(), client.getName(), client.getBirthdate(), client.getMail()});
+        }
+
+        this.jtable.setModel(model);
+
+    }
 
     private void deleteClient(){
         int dialogButton = JOptionPane.YES_NO_OPTION;
