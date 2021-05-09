@@ -17,14 +17,13 @@ public class ProducerManagement extends JDialog {
     public static boolean jEditCheck = false;
     private JButton deleteButton;
     private JButton backButton;
-    private JButton seachButton;
-    private JTextField textField1;
-    private JComboBox comboBox1;
+    private JButton searchB;
+    private JTextField in_search;
     private JButton viewRequestButton;
     private JTextField name_in;
     private JTextField phone_in;
     private JTextField email_in;
-    private JComboBox comboBox2;
+    private JComboBox farmInput;
     private JButton saveButton;
     private JButton addB;
     private JTextField text2;
@@ -34,6 +33,7 @@ public class ProducerManagement extends JDialog {
     private JLabel phoneInfo;
     private JPanel infoPanel;
     private JPanel editPanel;
+    private JLabel farmInfo;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JScrollPane scrollPane1;
@@ -44,6 +44,7 @@ public class ProducerManagement extends JDialog {
     public static String idProducerSelected;
     private static int idProducerConverted;
     private static int idProducerOnEdit;
+    private static List<FarmService> farms;
 
     public ProducerManagement() {
         setContentPane(contentPane);
@@ -125,6 +126,19 @@ public class ProducerManagement extends JDialog {
                 }
             }
         });
+        searchB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    searchProducer();
+                    jtable.revalidate();
+
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+
+                }
+            }
+        });
 
 
 
@@ -142,13 +156,38 @@ public class ProducerManagement extends JDialog {
         }
     }
 
+    private void searchProducer() throws SQLException {
+
+        producers = ProducerService.search(in_search.getText());
+
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Name");
+        model.addColumn("Mail");
+        model.addColumn("Phone");
+
+        for (ProducerService prod : producers) {
+            model.addRow(new Object[]{prod.getPROD_ID(), prod.getName(), prod.getMail(), prod.getPhone()});
+        }
+
+        this.jtable.setModel(model);
+
+    }
 
     private void showFullDetail(int id){
+
         ProducerService producer = new ProducerService();
         producer.read(id);
         nomeInfo.setText("Name: " + producer.getName());
         emailInfo.setText("Email: "+ producer.getMail());
         phoneInfo.setText("Phone: "+ producer.getPhone());
+        for(FarmService farm: farms){
+            if(farm.getIdProducer() == id){
+                farmInfo.setText("Farm "+ farm.getName());
+            }
+        }
+
+
 
 
     }
@@ -161,6 +200,15 @@ public class ProducerManagement extends JDialog {
         name_in.setText(producer.getName());
         email_in.setText(String.valueOf(producer.getMail()));
         phone_in.setText(String.valueOf(producer.getPhone()));
+
+
+        //Adiciona as quintas a combobox,
+        for(FarmService farm: farms){
+            farmInput.addItem(farm.getName());
+            if(farm.getIdProducer() == id){
+                farmInput.setSelectedItem(farm.getName());
+            }
+        }
 
 
     }
