@@ -12,7 +12,6 @@ public class ProducerService {
     private int phone;
     private String mail;
 
-
     public int getPROD_ID() {
         return PROD_ID;
     }
@@ -64,13 +63,12 @@ public class ProducerService {
         return list;
     }
 
-
-    public void read(int idEmployee){
+    public void read(int id){
         Connection conn = SQLConnection.criarConexao();
         String sqlCommand="SELECT * FROM PRODUCER WHERE PROD_ID= ?";
         try{
             PreparedStatement st = conn.prepareStatement(sqlCommand);
-            st.setInt(1, idEmployee);
+            st.setInt(1, id);
             ResultSet rs = st.executeQuery();
             if(rs.next()){
                 this.PROD_ID=(rs.getInt("PROD_ID"));
@@ -132,6 +130,43 @@ public class ProducerService {
         } catch (SQLException ex) {
             System.out.println("ERRO: " + ex.getMessage());
         }
+    }
+    public static List<ProducerService> search(String name) throws SQLException {
+
+        Connection conn = SQLConnection.criarConexao();
+        String sqlCommand = "SELECT * FROM PRODUCER ";
+
+        if(!name.isEmpty() ){
+            sqlCommand+= "WHERE NAME LIKE ? ";
+        }
+
+        sqlCommand+="ORDER BY NAME";
+        List<ProducerService> list = new ArrayList<>();
+
+        try {
+
+            PreparedStatement st = conn.prepareStatement(sqlCommand);
+
+            if(name.isEmpty() == false){
+                st.setString(1, "%" + name + "%");
+            }
+
+            ResultSet rs = st.executeQuery();
+            while(rs.next()){
+                ProducerService prod = new ProducerService();
+
+                prod.setPROD_ID(rs.getInt("PROD_ID"));
+                prod.setName(rs.getString("NAME: "));
+                prod.setMail(rs.getString("MAIL:"));
+                prod.setPhone(rs.getInt("PHONE"));
+                list.add(prod);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERRO: " + ex.getMessage());
+        }
+
+        return list;
     }
 
 
