@@ -183,12 +183,6 @@ public class RestockManagement extends JDialog {
 
         }
 
-
-        // for(EmployeeService emp : employees)
-
-            /*values.add(new String[] { String.valueOf(emp.getE_id()),  emp.getName(),  String.valueOf(emp.getBirthdate()),
-                    emp.getMail(),  String.valueOf(emp.getPhone()),  String.valueOf(emp.getSalary()), emp.getAddress(), emp.getZip() });
-*/
         JTable jtable = new JTable(model);
         jtable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 

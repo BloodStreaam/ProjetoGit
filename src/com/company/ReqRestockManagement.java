@@ -6,6 +6,20 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
 
+ class AddedProduct{
+    private String productName;
+    private int quantity;
+    private float price;
+
+    public void setData(String name, int quantity, float price)
+    {
+        this.productName = name;
+        this.quantity = quantity;
+        this.price = price;
+    }
+
+}
+
 public class ReqRestockManagement extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
@@ -40,10 +54,12 @@ public class ReqRestockManagement extends JDialog {
     private static String idReqRestockSelected;
     private static int idReqRestockConverted;
     private static int idReqRestockOnEdit;
-    private static Object[] productsAddedToRequest;
+    private static AddedProduct[] productsAddedToRequest = new AddedProduct[30];
+    private static int productCount = 0;
 
 
     public ReqRestockManagement() {
+
         setContentPane(contentPane);
         setModal(true);
 
@@ -137,6 +153,7 @@ public class ReqRestockManagement extends JDialog {
     private void addQuantityProductToRequest(){
         products = ProductService.readAll();
         ProductService prod = new ProductService();
+        AddedProduct addProduct = new AddedProduct();
 
 
         for(ProductService product: products){
@@ -148,7 +165,13 @@ public class ReqRestockManagement extends JDialog {
         String quantity = JOptionPane.showInputDialog("Quantity");
         int quantityInt = Integer.parseInt(quantity);
 
+        if(quantityInt >= 0){
+            productsAddedToRequest[productCount].setData(prod.getName(), quantityInt, prod.getPrice_un());
+            productCount++;
+        }
+
     }
+
 
     private void showFullDetail(int idReqRestock){
         ReqRestockService reqRestock = new ReqRestockService();
